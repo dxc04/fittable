@@ -2,7 +2,7 @@
 import RadarChart from '@/components/charts/RadarChart.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { home } from '@/routes';
 import { Head, Link } from '@inertiajs/vue3';
 import {
@@ -50,9 +50,9 @@ const props = defineProps<{
 }>();
 
 const getPriorityLabel = (importance: number) => {
-    if (importance >= 80) return 'High Priority';
-    if (importance >= 50) return 'Medium Priority';
-    return 'Low Priority';
+    if (importance >= 80) return 'High';
+    if (importance >= 50) return 'Med';
+    return 'Low';
 };
 
 const getPriorityColor = (importance: number) => {
@@ -79,253 +79,292 @@ const getRequirementColor = (index: number) => {
     <Head :title="`Analysis: ${analysis.jobTitle}`" />
 
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <!-- Company Header Banner -->
+        <!-- Compact Header -->
         <div
-            class="bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-8 text-white"
+            class="border-b bg-gradient-to-r from-blue-600 to-cyan-500 px-4 py-4 text-white"
         >
             <div class="container mx-auto">
-                <div class="flex items-center gap-4">
-                    <div
-                        class="flex h-16 w-16 items-center justify-center rounded-lg bg-white"
-                    >
-                        <Briefcase class="h-8 w-8 text-blue-600" />
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex h-12 w-12 items-center justify-center rounded-lg bg-white"
+                        >
+                            <Briefcase class="h-6 w-6 text-blue-600" />
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold">
+                                {{ analysis.jobTitle }}
+                            </h1>
+                            <div
+                                class="flex items-center gap-3 text-xs text-blue-100"
+                            >
+                                <span>{{ analysis.company }}</span>
+                                <span>•</span>
+                                <span>{{ analysis.location }}</span>
+                                <span>•</span>
+                                <span>{{ analysis.salaryRange }}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h1 class="text-2xl font-bold">
-                            {{ analysis.company }}
-                        </h1>
-                        <p class="text-blue-100">
-                            Transforming the digital landscape
-                        </p>
-                    </div>
+                    <Link :href="home.url()">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            class="text-white hover:bg-white/20"
+                        >
+                            ← Back
+                        </Button>
+                    </Link>
                 </div>
             </div>
         </div>
 
-        <div class="container mx-auto px-6 py-8">
-            <!-- Job Title and Details -->
-            <div class="mb-8">
-                <Link :href="home.url()">
-                    <Button variant="ghost" size="sm" class="mb-4">
-                        ← Back to Analysis
-                    </Button>
-                </Link>
-
-                <h2
-                    class="mb-4 text-3xl font-bold text-gray-900 dark:text-white"
-                >
-                    {{ analysis.jobTitle }}
-                </h2>
-
-                <!-- Job Details Bar -->
-                <div
-                    class="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400"
-                >
-                    <div class="flex items-center gap-2">
-                        <Briefcase class="h-4 w-4" />
-                        <span>{{ analysis.jobType }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <Monitor class="h-4 w-4" />
-                        <span>Remote / Hybrid</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <MapPin class="h-4 w-4" />
-                        <span>{{ analysis.location }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <DollarSign class="h-4 w-4" />
-                        <span>{{ analysis.salaryRange }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- About the Role -->
-            <section class="mb-12">
-                <h3
-                    class="mb-4 text-xl font-bold text-gray-900 dark:text-white"
-                >
-                    About the Role
-                </h3>
-                <p class="leading-relaxed text-gray-700 dark:text-gray-300">
-                    {{ analysis.summary }}
-                </p>
-            </section>
-
-            <!-- Skills and Experience Requirements -->
-            <div class="mb-12 grid gap-8 lg:grid-cols-2">
-                <!-- Required Skills (Left) -->
-                <section>
-                    <h3
-                        class="mb-6 text-xl font-bold text-gray-900 dark:text-white"
-                    >
-                        Required Skills
-                    </h3>
-                    <div v-if="analysis.skills.length > 0" class="mb-6">
-                        <RadarChart :skills="analysis.skills" />
-                        <div
-                            class="mt-4 flex items-center justify-center gap-4 text-sm"
-                        >
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="h-3 w-3 rounded-full bg-blue-500"
-                                ></div>
-                                <span class="text-gray-600 dark:text-gray-400"
-                                    >Required Level</span
-                                >
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="h-3 w-3 rounded-full bg-gray-300"
-                                ></div>
-                                <span class="text-gray-600 dark:text-gray-400"
-                                    >Industry Average</span
-                                >
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Experience Requirements (Right) -->
-                <section>
-                    <h3
-                        class="mb-6 text-xl font-bold text-gray-900 dark:text-white"
-                    >
-                        Experience Requirements
-                    </h3>
-                    <div class="space-y-6">
-                        <div
-                            v-for="(req, index) in analysis.requirements"
-                            :key="index"
-                        >
-                            <div class="mb-2 flex items-center justify-between">
-                                <span
-                                    class="font-medium text-gray-900 dark:text-white"
-                                    >{{ req.title }}</span
-                                >
-                                <span
-                                    class="text-sm text-gray-600 dark:text-gray-400"
-                                    >{{ req.priority }}%</span
-                                >
-                            </div>
-                            <div
-                                class="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
+        <div class="container mx-auto px-4 py-6">
+            <!-- Main Grid Layout -->
+            <div class="grid gap-4 lg:grid-cols-3">
+                <!-- Left Column: Summary & Skills -->
+                <div class="space-y-4 lg:col-span-1">
+                    <!-- Summary Card -->
+                    <Card>
+                        <CardHeader class="pb-3">
+                            <CardTitle class="text-base"
+                                >About the Role</CardTitle
                             >
-                                <div
-                                    :class="getRequirementColor(index)"
-                                    class="h-full transition-all duration-500"
-                                    :style="{ width: `${req.priority}%` }"
-                                />
-                            </div>
-                        </div>
-
-                        <!-- Additional Requirements -->
-                        <div
-                            v-if="analysis.skills.length > 0"
-                            class="mt-8 rounded-lg border bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
+                        </CardHeader>
+                        <CardContent
+                            class="text-sm text-gray-600 dark:text-gray-400"
                         >
-                            <h4
-                                class="mb-3 font-semibold text-gray-900 dark:text-white"
-                            >
-                                Additional Requirements
-                            </h4>
-                            <ul
-                                class="space-y-2 text-sm text-gray-700 dark:text-gray-300"
-                            >
-                                <li
-                                    v-for="skill in analysis.skills.slice(0, 5)"
-                                    :key="skill.name"
-                                    class="flex items-start gap-2"
-                                >
-                                    <span class="text-gray-400">•</span>
-                                    <span
-                                        >{{ skill.name }} ({{ skill.level }}%
-                                        proficiency)</span
-                                    >
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-            </div>
+                            {{ analysis.summary }}
+                        </CardContent>
+                    </Card>
 
-            <!-- Key Responsibilities -->
-            <section class="mb-12">
-                <h3
-                    class="mb-6 text-xl font-bold text-gray-900 dark:text-white"
-                >
-                    Key Responsibilities
-                </h3>
-                <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    <Card
-                        v-for="(
-                            responsibility, index
-                        ) in analysis.responsibilities"
-                        :key="index"
-                        class="border-l-4 border-gray-300 dark:border-gray-600"
-                    >
-                        <CardContent class="p-6">
-                            <div class="mb-3 flex items-start justify-between">
-                                <div class="flex items-start gap-3">
-                                    <CheckCircle2
-                                        class="mt-1 h-5 w-5 shrink-0 text-green-500"
-                                    />
-                                    <h4
-                                        class="font-semibold text-gray-900 dark:text-white"
-                                    >
-                                        {{ responsibility.title }}
-                                    </h4>
+                    <!-- Skills Radar Chart -->
+                    <Card>
+                        <CardHeader class="pb-3">
+                            <CardTitle class="text-base"
+                                >Required Skills</CardTitle
+                            >
+                        </CardHeader>
+                        <CardContent>
+                            <div v-if="analysis.skills.length > 0">
+                                <RadarChart :skills="analysis.skills" />
+                                <div
+                                    class="mt-2 flex items-center justify-center gap-3 text-xs"
+                                >
+                                    <div class="flex items-center gap-1">
+                                        <div
+                                            class="h-2 w-2 rounded-full bg-blue-500"
+                                        ></div>
+                                        <span
+                                            class="text-gray-600 dark:text-gray-400"
+                                            >Required</span
+                                        >
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <div
+                                            class="h-2 w-2 rounded-full bg-gray-300"
+                                        ></div>
+                                        <span
+                                            class="text-gray-600 dark:text-gray-400"
+                                            >Industry Avg</span
+                                        >
+                                    </div>
                                 </div>
                             </div>
-                            <p
-                                class="mb-3 text-sm text-gray-600 dark:text-gray-400"
-                            >
-                                {{ responsibility.description }}
-                            </p>
-                            <Badge
-                                :class="
-                                    getPriorityColor(responsibility.importance)
-                                "
-                                class="text-xs"
-                            >
-                                {{
-                                    getPriorityLabel(responsibility.importance)
-                                }}
-                            </Badge>
                         </CardContent>
                     </Card>
                 </div>
-            </section>
 
-            <!-- Benefits (if any) -->
-            <section v-if="analysis.benefits.length > 0" class="mb-12">
-                <h3
-                    class="mb-6 text-xl font-bold text-gray-900 dark:text-white"
-                >
-                    Benefits & Perks
-                </h3>
-                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    <div
-                        v-for="(benefit, index) in analysis.benefits"
-                        :key="index"
-                        class="flex items-center gap-3 rounded-lg border bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
-                    >
-                        <CheckCircle2 class="h-5 w-5 shrink-0 text-green-500" />
-                        <span
-                            class="text-sm text-gray-700 dark:text-gray-300"
-                            >{{ benefit }}</span
-                        >
-                    </div>
+                <!-- Middle Column: Requirements & Responsibilities -->
+                <div class="space-y-4 lg:col-span-1">
+                    <!-- Experience Requirements -->
+                    <Card>
+                        <CardHeader class="pb-3">
+                            <CardTitle class="text-base"
+                                >Experience Requirements</CardTitle
+                            >
+                        </CardHeader>
+                        <CardContent class="space-y-3">
+                            <div
+                                v-for="(req, index) in analysis.requirements"
+                                :key="index"
+                            >
+                                <div
+                                    class="mb-1 flex items-center justify-between text-sm"
+                                >
+                                    <span
+                                        class="font-medium text-gray-900 dark:text-white"
+                                        >{{ req.title }}</span
+                                    >
+                                    <span
+                                        class="text-xs text-gray-600 dark:text-gray-400"
+                                        >{{ req.priority }}%</span
+                                    >
+                                </div>
+                                <div
+                                    class="h-1.5 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
+                                >
+                                    <div
+                                        :class="getRequirementColor(index)"
+                                        class="h-full transition-all duration-500"
+                                        :style="{ width: `${req.priority}%` }"
+                                    />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <!-- Compact Responsibilities -->
+                    <Card>
+                        <CardHeader class="pb-3">
+                            <CardTitle class="text-base"
+                                >Key Responsibilities</CardTitle
+                            >
+                        </CardHeader>
+                        <CardContent class="space-y-2">
+                            <div
+                                v-for="(
+                                    responsibility, index
+                                ) in analysis.responsibilities.slice(0, 4)"
+                                :key="index"
+                                class="flex items-start gap-2 rounded-md border p-2 dark:border-gray-700"
+                            >
+                                <CheckCircle2
+                                    class="mt-0.5 h-4 w-4 shrink-0 text-green-500"
+                                />
+                                <div class="flex-1">
+                                    <h4
+                                        class="text-sm font-semibold text-gray-900 dark:text-white"
+                                    >
+                                        {{ responsibility.title }}
+                                    </h4>
+                                    <p
+                                        class="text-xs text-gray-600 dark:text-gray-400"
+                                    >
+                                        {{ responsibility.description }}
+                                    </p>
+                                </div>
+                                <Badge
+                                    :class="
+                                        getPriorityColor(
+                                            responsibility.importance,
+                                        )
+                                    "
+                                    class="shrink-0 text-xs"
+                                >
+                                    {{
+                                        getPriorityLabel(
+                                            responsibility.importance,
+                                        )
+                                    }}
+                                </Badge>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
-            </section>
 
-            <!-- Action Button -->
-            <div class="flex justify-center">
-                <Link :href="home.url()">
-                    <Button size="lg" class="bg-blue-600 hover:bg-blue-700">
-                        Analyze Another Job
-                    </Button>
-                </Link>
+                <!-- Right Column: Additional Info -->
+                <div class="space-y-4 lg:col-span-1">
+                    <!-- Skills List -->
+                    <Card v-if="analysis.skills.length > 0">
+                        <CardHeader class="pb-3">
+                            <CardTitle class="text-base"
+                                >Skills Breakdown</CardTitle
+                            >
+                        </CardHeader>
+                        <CardContent>
+                            <div class="space-y-2">
+                                <div
+                                    v-for="skill in analysis.skills"
+                                    :key="skill.name"
+                                    class="flex items-center justify-between text-sm"
+                                >
+                                    <span
+                                        class="text-gray-900 dark:text-white"
+                                        >{{ skill.name }}</span
+                                    >
+                                    <div class="flex items-center gap-2">
+                                        <div
+                                            class="h-1.5 w-16 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
+                                        >
+                                            <div
+                                                class="h-full bg-blue-500"
+                                                :style="{
+                                                    width: `${skill.level}%`,
+                                                }"
+                                            />
+                                        </div>
+                                        <span
+                                            class="w-10 text-right text-xs text-gray-600 dark:text-gray-400"
+                                            >{{ skill.level }}%</span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <!-- Benefits -->
+                    <Card v-if="analysis.benefits.length > 0">
+                        <CardHeader class="pb-3">
+                            <CardTitle class="text-base"
+                                >Benefits & Perks</CardTitle
+                            >
+                        </CardHeader>
+                        <CardContent>
+                            <div class="space-y-1.5">
+                                <div
+                                    v-for="(
+                                        benefit, index
+                                    ) in analysis.benefits"
+                                    :key="index"
+                                    class="flex items-start gap-2 text-sm"
+                                >
+                                    <CheckCircle2
+                                        class="mt-0.5 h-4 w-4 shrink-0 text-green-500"
+                                    />
+                                    <span
+                                        class="text-gray-700 dark:text-gray-300"
+                                        >{{ benefit }}</span
+                                    >
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <!-- Job Details -->
+                    <Card>
+                        <CardHeader class="pb-3">
+                            <CardTitle class="text-base">Job Details</CardTitle>
+                        </CardHeader>
+                        <CardContent class="space-y-2 text-sm">
+                            <div
+                                class="flex items-center gap-2 text-gray-700 dark:text-gray-300"
+                            >
+                                <Briefcase class="h-4 w-4 text-gray-400" />
+                                <span>{{ analysis.jobType }}</span>
+                            </div>
+                            <div
+                                class="flex items-center gap-2 text-gray-700 dark:text-gray-300"
+                            >
+                                <Monitor class="h-4 w-4 text-gray-400" />
+                                <span>Remote / Hybrid</span>
+                            </div>
+                            <div
+                                class="flex items-center gap-2 text-gray-700 dark:text-gray-300"
+                            >
+                                <MapPin class="h-4 w-4 text-gray-400" />
+                                <span>{{ analysis.location }}</span>
+                            </div>
+                            <div
+                                class="flex items-center gap-2 text-gray-700 dark:text-gray-300"
+                            >
+                                <DollarSign class="h-4 w-4 text-gray-400" />
+                                <span>{{ analysis.salaryRange }}</span>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </div>
     </div>

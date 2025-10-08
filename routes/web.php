@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Controllers\JobAnalysisController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome');
-})->name('home');
+Route::get('/', [JobAnalysisController::class, 'index'])->name('home');
+Route::post('/analyze', [JobAnalysisController::class, 'analyze'])->name('job.analyze');
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');

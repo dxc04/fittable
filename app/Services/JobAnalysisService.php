@@ -10,7 +10,8 @@ class JobAnalysisService
     {
         $prompt = $this->buildAnalysisPrompt($jobAdText);
 
-        $result = Gemini::geminiPro()->generateContent($prompt);
+        $result = Gemini::generativeModel(model: 'gemini-2.0-flash-exp')
+            ->generateContent($prompt);
 
         return $this->parseGeminiResponse($result->text());
     }

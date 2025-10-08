@@ -11,6 +11,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { home } from '@/routes';
 import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -97,7 +98,7 @@ const getCategoryColor = (category: string) => {
         <div class="container mx-auto px-4 py-12">
             <!-- Header -->
             <div class="mb-8">
-                <Link :href="route('home')">
+                <Link :href="home.url()">
                     <Button variant="ghost" size="sm" class="mb-4">
                         ← Analyze Another Job
                     </Button>
@@ -489,7 +490,7 @@ const getCategoryColor = (category: string) => {
 
             <!-- Action Buttons -->
             <div class="flex justify-center gap-4">
-                <Link :href="route('home')">
+                <Link :href="home.url()">
                     <Button size="lg"> Analyze Another Job </Button>
                 </Link>
             </div>

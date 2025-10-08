@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { analyze } from '@/routes/job';
 import { Head, useForm } from '@inertiajs/vue3';
 
 const form = useForm({
@@ -17,7 +18,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('job.analyze'), {
+    form.post(analyze.url(), {
         preserveScroll: true,
     });
 };

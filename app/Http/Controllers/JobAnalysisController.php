@@ -21,11 +21,17 @@ class JobAnalysisController extends Controller
     public function analyze(Request $request)
     {
         $validated = $request->validate([
+            'jobTitle' => ['nullable', 'string', 'max:255'],
+            'company' => ['nullable', 'string', 'max:255'],
             'jobAdText' => ['required', 'string', 'min:50', 'max:10000'],
         ]);
 
         try {
-            $analysis = $this->jobAnalysisService->analyzeJobAd($validated['jobAdText']);
+            $analysis = $this->jobAnalysisService->analyzeJobAd(
+                $validated['jobAdText'],
+                $validated['jobTitle'] ?? null,
+                $validated['company'] ?? null
+            );
 
             return Inertia::render('JobAnalysis/Results', [
                 'analysis' => $analysis,

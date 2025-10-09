@@ -8,12 +8,15 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { analyze } from '@/routes/job';
 import { Head, useForm } from '@inertiajs/vue3';
 
 const form = useForm({
+    jobTitle: '',
+    company: '',
     jobAdText: '',
 });
 
@@ -100,6 +103,40 @@ const useSample = () => {
                 </CardHeader>
                 <CardContent>
                     <form @submit.prevent="submit" class="space-y-6">
+                        <!-- Optional Fields -->
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="space-y-2">
+                                <Label for="jobTitle"
+                                    >Job Title
+                                    <span class="text-xs text-muted-foreground"
+                                        >(Optional)</span
+                                    ></Label
+                                >
+                                <Input
+                                    id="jobTitle"
+                                    v-model="form.jobTitle"
+                                    placeholder="e.g., Senior Full-Stack Developer"
+                                    :disabled="form.processing"
+                                />
+                                <InputError :message="form.errors.jobTitle" />
+                            </div>
+                            <div class="space-y-2">
+                                <Label for="company"
+                                    >Company
+                                    <span class="text-xs text-muted-foreground"
+                                        >(Optional)</span
+                                    ></Label
+                                >
+                                <Input
+                                    id="company"
+                                    v-model="form.company"
+                                    placeholder="e.g., TechVision Inc."
+                                    :disabled="form.processing"
+                                />
+                                <InputError :message="form.errors.company" />
+                            </div>
+                        </div>
+
                         <div class="space-y-2">
                             <div class="flex items-center justify-between">
                                 <Label for="jobAdText"

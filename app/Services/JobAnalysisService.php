@@ -6,14 +6,25 @@ use Gemini\Laravel\Facades\Gemini;
 
 class JobAnalysisService
 {
-    public function analyzeJobAd(string $jobAdText): array
+    public function analyzeJobAd(string $jobAdText, ?string $jobTitle = null, ?string $company = null): array
     {
         $prompt = $this->buildAnalysisPrompt($jobAdText);
 
         $result = Gemini::generativeModel(model: 'gemini-2.0-flash-exp')
             ->generateContent($prompt);
 
-        return $this->parseGeminiResponse($result->text());
+        $analysis = $this->parseGeminiResponse($result->text());
+
+        // Override with user-provided values if available
+        if ($jobTitle) {
+            $analysis['jobTitle'] = $jobTitle;
+        }
+
+        if ($company) {
+            $analysis['company'] = $company;
+        }
+
+        return $analysis;
     }
 
     protected function buildAnalysisPrompt(string $jobAdText): string

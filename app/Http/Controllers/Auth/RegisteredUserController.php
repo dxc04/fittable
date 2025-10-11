@@ -48,6 +48,11 @@ class RegisteredUserController extends Controller
 
         $request->session()->regenerate();
 
+        // Check if there's a pending job analysis to process
+        if ($request->session()->has('pending_job_analysis')) {
+            return redirect()->route('job.analyze.process');
+        }
+
         return to_route('dashboard');
     }
 }

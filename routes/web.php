@@ -10,6 +10,10 @@ Route::get('/', function () {
 
 Route::get('/analyze', [JobAnalysisController::class, 'index'])->name('job.index');
 Route::post('/analyze', [JobAnalysisController::class, 'analyze'])->name('job.analyze');
+Route::middleware('auth')->group(function () {
+    Route::get('/analyze/process', [JobAnalysisController::class, 'processPendingAnalysis'])->name('job.analyze.process');
+    Route::post('/assess-resume', [JobAnalysisController::class, 'assessResume'])->name('job.assessResume');
+});
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');

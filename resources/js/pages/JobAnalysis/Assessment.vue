@@ -12,13 +12,33 @@ interface SkillBreakdown {
     domain: number;
 }
 
+interface ApplicationStrategy {
+    resumeOptimization: string[];
+    coverLetterFocus: string[];
+    howToAddressGaps: string[];
+}
+
+interface InterviewPreparation {
+    likelyQuestions: string[];
+    topicsToStudy: string[];
+    storiesToPrepare: string[];
+}
+
+interface PersonalizedRecommendation {
+    shouldApply: string;
+    biggestAdvantage: string;
+    nextStep: string;
+}
+
 interface Assessment {
     overallMatch: number;
     skillBreakdown: SkillBreakdown;
     summary: string;
     strengths: string[];
     gaps: string[];
-    recommendation: string;
+    applicationStrategy?: ApplicationStrategy;
+    interviewPreparation?: InterviewPreparation;
+    personalizedRecommendation?: PersonalizedRecommendation;
 }
 
 interface JobInfo {
@@ -167,82 +187,216 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </div>
                 </div>
 
-                <!-- Your Strengths & Skills to Develop -->
-                <div class="mb-8 grid gap-6 lg:grid-cols-2">
-                    <!-- Your Strengths -->
-                    <div class="border-2 border-gray-700 bg-[#2a2d3e] p-8">
-                        <h3 class="mb-4 text-xl font-bold text-white">
-                            Your Strengths
-                        </h3>
-                        <p class="text-sm leading-relaxed text-gray-300">
-                            {{ assessment.strengths.join('. ') }}.
-                        </p>
-                    </div>
-
-                    <!-- Skills to Highlight or Develop -->
-                    <div class="border-2 border-gray-700 bg-[#2a2d3e] p-8">
-                        <h3 class="mb-4 text-xl font-bold text-white">
-                            Skills to Highlight or Develop
-                        </h3>
-                        <p class="text-sm leading-relaxed text-gray-300">
-                            <template v-if="assessment.gaps.length > 0">
-                                While you possess a strong skill set, consider
-                                highlighting your experience in the following
-                                areas: {{ assessment.gaps.join(', ') }}.
-                            </template>
-                            <template v-else>
-                                Your skills align very well with this position.
-                                Focus on emphasizing your strengths in your
-                                application materials.
-                            </template>
-                        </p>
+                <!-- Your Strengths to Emphasize -->
+                <div class="mb-8 border-2 border-green-500 bg-[#2a2d3e] p-8">
+                    <h3 class="mb-6 text-2xl font-bold text-white uppercase">
+                        Your Strengths to Emphasize
+                    </h3>
+                    <div class="space-y-4">
+                        <div
+                            v-for="(strength, index) in assessment.strengths"
+                            :key="index"
+                            class="flex items-start gap-3"
+                        >
+                            <span class="text-2xl">✅</span>
+                            <p
+                                class="flex-1 text-base leading-relaxed text-gray-300"
+                            >
+                                {{ strength }}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Missing Skills -->
+                <!-- Your Gaps to Address Proactively -->
                 <div
                     v-if="assessment.gaps.length > 0"
-                    class="mb-8 border-2 border-gray-700 bg-[#2a2d3e] p-8"
+                    class="mb-8 border-2 border-orange-500 bg-[#2a2d3e] p-8"
                 >
-                    <h3 class="mb-4 text-xl font-bold text-white">
-                        Missing Skills
+                    <h3 class="mb-6 text-2xl font-bold text-white uppercase">
+                        Your Gaps to Address Proactively
                     </h3>
-                    <p class="text-sm leading-relaxed text-gray-300">
-                        Based on the job description, you may need to further
-                        develop skills in {{ assessment.gaps.join(', ') }}.
-                        Consider taking online courses or working on projects to
-                        gain experience in these areas.
-                    </p>
+                    <div class="space-y-4">
+                        <div
+                            v-for="(gap, index) in assessment.gaps"
+                            :key="index"
+                            class="flex items-start gap-3"
+                        >
+                            <span class="text-2xl">❌</span>
+                            <p
+                                class="flex-1 text-base leading-relaxed text-gray-300"
+                            >
+                                {{ gap }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Our Recommendation -->
-                <div class="border-2 border-[#e900ff] bg-[#e900ff] p-8">
-                    <h3 class="mb-4 text-xl font-bold text-white">
-                        Our Recommendation
+                <!-- Application Strategy -->
+                <div
+                    v-if="assessment.applicationStrategy"
+                    class="mb-8 border-2 border-purple-500 bg-[#2a2d3e] p-8"
+                >
+                    <h3 class="mb-6 text-2xl font-bold text-white uppercase">
+                        Application Strategy
                     </h3>
-                    <p class="text-sm leading-relaxed text-white">
-                        <template v-if="assessment.overallMatch >= 80">
-                            Given your strong match score and relevant
-                            experience, we recommend applying for this position.
-                            Tailor your resume to emphasize your strengths and
-                            address any potential skill gaps. Prepare examples
-                            of your work that demonstrate your technical
-                            proficiency, communication abilities, and
-                            problem-solving skills.
-                        </template>
-                        <template v-else-if="assessment.overallMatch >= 60">
-                            You're a good candidate for this position. Highlight
-                            your key strengths in your application and be
-                            prepared to discuss how you can address any skill
-                            gaps through learning and development.
-                        </template>
-                        <template v-else>
-                            Consider building more experience in the required
-                            areas before applying. Focus on developing the
-                            missing skills through courses, projects, or related
-                            positions.
-                        </template>
-                    </p>
+
+                    <!-- Resume Optimization -->
+                    <div class="mb-6">
+                        <h4 class="mb-3 text-lg font-semibold text-purple-400">
+                            Resume Optimization
+                        </h4>
+                        <ul class="space-y-2 pl-6">
+                            <li
+                                v-for="(tip, index) in assessment
+                                    .applicationStrategy.resumeOptimization"
+                                :key="index"
+                                class="list-disc text-base leading-relaxed text-gray-300"
+                            >
+                                {{ tip }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Cover Letter Focus -->
+                    <div class="mb-6">
+                        <h4 class="mb-3 text-lg font-semibold text-purple-400">
+                            Cover Letter Focus
+                        </h4>
+                        <ul class="space-y-2 pl-6">
+                            <li
+                                v-for="(point, index) in assessment
+                                    .applicationStrategy.coverLetterFocus"
+                                :key="index"
+                                class="list-disc text-base leading-relaxed text-gray-300"
+                            >
+                                {{ point }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- How to Address Gaps -->
+                    <div>
+                        <h4 class="mb-3 text-lg font-semibold text-purple-400">
+                            How to Address Gaps
+                        </h4>
+                        <ul class="space-y-2 pl-6">
+                            <li
+                                v-for="(strategy, index) in assessment
+                                    .applicationStrategy.howToAddressGaps"
+                                :key="index"
+                                class="list-disc text-base leading-relaxed text-gray-300"
+                            >
+                                {{ strategy }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Interview Preparation -->
+                <div
+                    v-if="assessment.interviewPreparation"
+                    class="mb-8 border-2 border-cyan-500 bg-[#2a2d3e] p-8"
+                >
+                    <h3 class="mb-6 text-2xl font-bold text-white uppercase">
+                        Interview Preparation
+                    </h3>
+
+                    <!-- Likely Questions -->
+                    <div class="mb-6">
+                        <h4 class="mb-3 text-lg font-semibold text-cyan-400">
+                            Likely Questions
+                        </h4>
+                        <ul class="space-y-2 pl-6">
+                            <li
+                                v-for="(question, index) in assessment
+                                    .interviewPreparation.likelyQuestions"
+                                :key="index"
+                                class="list-disc text-base leading-relaxed text-gray-300"
+                            >
+                                {{ question }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Topics to Study -->
+                    <div class="mb-6">
+                        <h4 class="mb-3 text-lg font-semibold text-cyan-400">
+                            Topics to Study
+                        </h4>
+                        <ul class="space-y-2 pl-6">
+                            <li
+                                v-for="(topic, index) in assessment
+                                    .interviewPreparation.topicsToStudy"
+                                :key="index"
+                                class="list-disc text-base leading-relaxed text-gray-300"
+                            >
+                                {{ topic }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Stories to Prepare -->
+                    <div>
+                        <h4 class="mb-3 text-lg font-semibold text-cyan-400">
+                            Stories to Prepare (STAR Method)
+                        </h4>
+                        <ul class="space-y-2 pl-6">
+                            <li
+                                v-for="(story, index) in assessment
+                                    .interviewPreparation.storiesToPrepare"
+                                :key="index"
+                                class="list-disc text-base leading-relaxed text-gray-300"
+                            >
+                                {{ story }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Personalized Recommendation -->
+                <div
+                    v-if="assessment.personalizedRecommendation"
+                    class="border-2 border-[#e900ff] bg-[#e900ff] p-8"
+                >
+                    <h3 class="mb-6 text-2xl font-bold text-white uppercase">
+                        Your Action Plan
+                    </h3>
+                    <div class="space-y-4 text-white">
+                        <div>
+                            <h4 class="mb-2 text-lg font-semibold">
+                                Should You Apply?
+                            </h4>
+                            <p class="leading-relaxed">
+                                {{
+                                    assessment.personalizedRecommendation
+                                        .shouldApply
+                                }}
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="mb-2 text-lg font-semibold">
+                                Your Biggest Advantage
+                            </h4>
+                            <p class="leading-relaxed">
+                                {{
+                                    assessment.personalizedRecommendation
+                                        .biggestAdvantage
+                                }}
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="mb-2 text-lg font-semibold">
+                                Next Step (Do This Today)
+                            </h4>
+                            <p class="leading-relaxed font-semibold">
+                                {{
+                                    assessment.personalizedRecommendation
+                                        .nextStep
+                                }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

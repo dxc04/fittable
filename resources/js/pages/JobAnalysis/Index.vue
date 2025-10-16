@@ -42,7 +42,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     <Head title="Job Fit Analysis" />
 
     <AppLayout v-if="isAuthenticated" :breadcrumbs="breadcrumbs">
-        <div class="min-h-screen bg-[#2a1a4a] px-8 py-12">
+        <div class="min-h-screen bg-[#1a1d2e] px-8 py-12">
             <div class="mx-auto max-w-4xl">
                 <!-- Header -->
                 <div class="mb-8">
@@ -116,7 +116,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         </div>
     </AppLayout>
 
-    <div v-else class="min-h-screen bg-[#2a1a4a] px-8 py-12">
+    <div v-else class="min-h-screen bg-[#1a1d2e] px-8 py-12">
         <div class="mx-auto max-w-4xl">
             <!-- Header -->
             <div class="mb-8">

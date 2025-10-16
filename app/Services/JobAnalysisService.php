@@ -40,7 +40,7 @@ class JobAnalysisService
     protected function buildAssessmentPrompt(string $resumeText, string $jobAdText): string
     {
         return <<<PROMPT
-Analyze this candidate's resume against the job requirements and provide a comprehensive assessment. Return ONLY a valid JSON object with this exact structure:
+Analyze this candidate's resume against the job requirements and provide a comprehensive, honest assessment. Return ONLY a valid JSON object with this exact structure:
 
 {
     "overallMatch": 85,
@@ -51,17 +51,59 @@ Analyze this candidate's resume against the job requirements and provide a compr
     },
     "summary": "You possess strong technical skills in software development and system design. Your experience aligns well with the requirements of this role. You would likely be a strong candidate for this position.",
     "strengths": [
-        "You excel in technical skills, particularly in software development and system design",
-        "Your communication skills are strong, enabling you to effectively convey complex ideas and collaborate with team members",
-        "You demonstrate excellent problem-solving abilities through your project work and technical experience",
-        "Your teamwork experience shows you can work effectively in collaborative environments"
+        "13+ years of development experience - you're not a junior developer",
+        "Remote work veteran - you know how to work independently and communicate well",
+        "Mentoring experience - you can help others, not just code",
+        "Product thinking - you've built features users rely on daily",
+        "Fast learner - you've picked up new technologies throughout your career"
     ],
     "gaps": [
-        "Project management and leadership experience",
-        "Cloud computing skills (AWS, Azure)",
-        "Specific programming languages or frameworks mentioned in the job description"
+        "Limited Vue3 production experience - \"I've used Vue2 and I'm ready to dive into Vue3\"",
+        "No TypeScript depth - \"I've used it but haven't made it my primary language yet\"",
+        "Not frontend-exclusive - \"I'm pivoting from fullstack to frontend-focused work\"",
+        "No data visualization experience - \"I haven't built complex charts but I'm interested in learning\""
     ],
-    "recommendation": "hire"
+    "applicationStrategy": {
+        "resumeOptimization": [
+            "Highlight your 13+ years of experience prominently in your summary",
+            "Create a 'Remote Work Experience' section showcasing your distributed team successes",
+            "Add metrics to your mentoring experience (e.g., 'Mentored 8 junior developers over 3 years')",
+            "Lead with projects that demonstrate product thinking and user impact"
+        ],
+        "coverLetterFocus": [
+            "Open with your strongest match: extensive development experience and proven remote work success",
+            "Address the Vue3/TypeScript gaps head-on with your Vue2 background and learning track record",
+            "Close with genuine enthusiasm for the product and specific reasons you're excited about this role"
+        ],
+        "howToAddressGaps": [
+            "For Vue3: Mention you're already building a side project with Vue3 to get hands-on experience",
+            "For TypeScript: Highlight that you've used it and are committed to deepening your knowledge",
+            "For frontend focus: Frame your fullstack background as an advantage for understanding system architecture"
+        ]
+    },
+    "interviewPreparation": {
+        "likelyQuestions": [
+            "Tell me about your experience working in remote teams and how you stay productive",
+            "Can you walk me through a complex feature you built and the impact it had?",
+            "How do you approach learning new technologies quickly?",
+            "Describe a time when you mentored a junior developer through a challenging problem"
+        ],
+        "topicsToStudy": [
+            "Vue 3 Composition API and its differences from Vue 2 Options API",
+            "TypeScript advanced patterns (generics, utility types, type inference)",
+            "Modern frontend testing strategies (unit, integration, e2e)"
+        ],
+        "storiesToPrepare": [
+            "Situation: Legacy system migration. Task: Lead the refactor. Action: Your approach. Result: Quantifiable impact",
+            "Situation: Remote team coordination challenge. Task: Keep project on track. Action: Your solution. Result: Team success",
+            "Situation: Learning a new technology under pressure. Task: Deliver quickly. Action: Your process. Result: Successful delivery"
+        ]
+    },
+    "personalizedRecommendation": {
+        "shouldApply": "Apply now - you're a strong candidate with the core skills they need, and your learning track record will cover any gaps quickly.",
+        "biggestAdvantage": "Your combination of deep technical experience and proven remote work success makes you a low-risk hire who can contribute from day one.",
+        "nextStep": "Today: Start a small Vue3 project using TypeScript to demonstrate your commitment to closing the skill gaps, then apply with confidence."
+    }
 }
 
 Guidelines for assessment:
@@ -70,9 +112,38 @@ Guidelines for assessment:
 - skillBreakdown.soft: Score for soft skills (communication, teamwork, problem-solving) - 0-100
 - skillBreakdown.domain: Score for domain knowledge and industry-specific expertise - 0-100
 - summary: 2-3 sentences in second person ("You...") explaining the candidate's overall fit and potential
-- strengths: Array of 3-5 specific, detailed strengths written in second person. Focus on concrete skills and experiences that align with the job
-- gaps: Array of 2-4 specific skill gaps or areas for development. Be constructive and specific about what's missing
-- recommendation: Must be one of: "hire" (80%+ match), "interview" (60-79% match), or "reject" (<60% match)
+
+STRENGTHS FORMAT (3-6 items):
+Write each strength as: "[Specific achievement/experience] - [why it matters for this job]"
+Examples:
+- "15 years of backend development - you're a senior engineer, not a junior"
+- "Led teams of 5+ developers - you can mentor and guide others"
+- "Built systems handling millions of users - you understand scale"
+- "Strong communication skills - you've worked with remote teams successfully"
+Focus on making the candidate feel confident and understood. Highlight years of experience, proven abilities, and transferable skills.
+
+GAPS FORMAT (2-4 items):
+Write each gap as: "[What's missing] - \"[Suggested talking point in first person]\""
+Examples:
+- "Limited React experience - \"I've used Vue extensively and I'm ready to learn React\""
+- "No AWS certification - \"I have hands-on cloud experience but haven't pursued certification yet\""
+- "Junior in leadership - \"I've mentored individuals but haven't managed a full team yet\""
+Be honest about gaps but provide a confident, reasonable way to address them in interviews.
+
+APPLICATION STRATEGY:
+- resumeOptimization: 3-4 specific, actionable tips on what to emphasize or reword on their resume
+- coverLetterFocus: 2-3 key points they should highlight in their cover letter
+- howToAddressGaps: 2-3 specific strategies to explain or compensate for missing requirements
+
+INTERVIEW PREPARATION:
+- likelyQuestions: 3-4 interview questions they should prepare for based on their background and the job requirements
+- topicsToStudy: 2-3 technical or domain topics they should review before the interview
+- storiesToPrepare: 2-3 STAR method (Situation, Task, Action, Result) examples they should have ready
+
+PERSONALIZED RECOMMENDATION:
+- shouldApply: Clear, honest advice on whether they should apply now or wait and develop skills first (1-2 sentences)
+- biggestAdvantage: What makes them uniquely valuable for this role (1 sentence)
+- nextStep: One specific, actionable step they should take today (1 sentence)
 
 Job Requirements:
 {$jobAdText}
@@ -102,7 +173,21 @@ PROMPT;
                 'summary' => $data['summary'] ?? '',
                 'strengths' => $data['strengths'] ?? [],
                 'gaps' => $data['gaps'] ?? [],
-                'recommendation' => $data['recommendation'] ?? 'interview',
+                'applicationStrategy' => [
+                    'resumeOptimization' => $data['applicationStrategy']['resumeOptimization'] ?? [],
+                    'coverLetterFocus' => $data['applicationStrategy']['coverLetterFocus'] ?? [],
+                    'howToAddressGaps' => $data['applicationStrategy']['howToAddressGaps'] ?? [],
+                ],
+                'interviewPreparation' => [
+                    'likelyQuestions' => $data['interviewPreparation']['likelyQuestions'] ?? [],
+                    'topicsToStudy' => $data['interviewPreparation']['topicsToStudy'] ?? [],
+                    'storiesToPrepare' => $data['interviewPreparation']['storiesToPrepare'] ?? [],
+                ],
+                'personalizedRecommendation' => [
+                    'shouldApply' => $data['personalizedRecommendation']['shouldApply'] ?? '',
+                    'biggestAdvantage' => $data['personalizedRecommendation']['biggestAdvantage'] ?? '',
+                    'nextStep' => $data['personalizedRecommendation']['nextStep'] ?? '',
+                ],
             ];
         } catch (\JsonException $e) {
             throw new \RuntimeException('Failed to parse AI assessment: '.$e->getMessage());

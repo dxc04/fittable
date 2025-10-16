@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { Button } from '@/components/ui/button';
 import { index } from '@/routes/job';
 import { store } from '@/routes/login';
+import { index as recruiterIndex } from '@/routes/recruiter';
 import { Head, Link } from '@inertiajs/vue3';
 import {
     ArrowRight,
@@ -15,17 +17,21 @@ import {
 <template>
     <Head title="Fittable - Find the perfect job match" />
 
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div
+        class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800"
+    >
         <!-- Header -->
-        <header class="border-b bg-white dark:border-gray-800">
+        <header class="border-b bg-white dark:border-gray-800 dark:bg-gray-900">
             <div
                 class="container mx-auto flex items-center justify-between px-6 py-4"
             >
-                <div class="text-xl font-bold text-gray-900">Fittable</div>
+                <div class="flex items-center gap-3">
+                    <AppLogoIcon class="h-10 w-40" />
+                </div>
                 <nav class="flex items-center gap-6">
                     <Link
                         :href="store.url()"
-                        class="text-md font-semibold text-primary hover:text-gray-900 dark:hover:text-white"
+                        class="text-md font-semibold text-primary hover:text-primary/80"
                         >Login</Link
                     >
                 </nav>
@@ -65,50 +71,63 @@ import {
                                 Job Seeker
                             </Button>
                         </Link>
-                        <button
-                            class="flex h-12 min-w-[160px] items-center justify-center rounded-lg bg-primary/20 px-6 text-base font-bold text-primary backdrop-blur-sm transition-colors hover:bg-primary/30"
-                        >
-                            <span>Recruiter</span>
-                        </button>
+                        <Link :href="recruiterIndex.url()">
+                            <Button
+                                size="lg"
+                                class="flex h-12 min-w-[160px] items-center justify-center rounded-lg bg-primary/20 px-6 text-base font-bold text-primary backdrop-blur-sm transition-colors hover:bg-primary/30"
+                            >
+                                <span>Recruiter</span>
+                            </Button>
+                        </Link>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- How It Works -->
-        <section class="bg-white py-20">
+        <section class="bg-white py-20 dark:bg-gray-900">
             <div class="container mx-auto px-6">
-                <h2 class="mb-12 text-center text-5xl font-bold text-gray-900">
+                <h2
+                    class="mb-12 text-center text-5xl font-bold text-gray-900 dark:text-white"
+                >
                     How it works
                 </h2>
                 <div class="grid gap-8 md:grid-cols-3">
                     <!-- Step 1 -->
-                    <div class="border px-6 py-6 text-center">
+                    <div
+                        class="border px-6 py-6 text-center dark:border-gray-700 dark:bg-gray-800"
+                    >
                         <div
                             class="mx-auto mb-6 flex items-center justify-center rounded-xl"
                         >
                             <Glasses class="h-8 w-8 text-primary" />
                         </div>
-                        <h3 class="mb-3 text-xl font-bold text-gray-900">
+                        <h3
+                            class="mb-3 text-xl font-bold text-gray-900 dark:text-white"
+                        >
                             Analyze Job Descriptions
                         </h3>
-                        <p class="text-gray-600">
+                        <p class="text-gray-600 dark:text-gray-300">
                             Paste a job description to identify the core skills
                             and qualifications required.
                         </p>
                     </div>
 
                     <!-- Step 2 -->
-                    <div class="border px-6 py-6 text-center">
+                    <div
+                        class="border px-6 py-6 text-center dark:border-gray-700 dark:bg-gray-800"
+                    >
                         <div
                             class="mx-auto mb-6 flex items-center justify-center rounded-xl"
                         >
                             <FileText class="h-8 w-8 text-primary" />
                         </div>
-                        <h3 class="mb-3 text-xl font-bold text-gray-900">
+                        <h3
+                            class="mb-3 text-xl font-bold text-gray-900 dark:text-white"
+                        >
                             Match Resume
                         </h3>
-                        <p class="text-gray-600">
+                        <p class="text-gray-600 dark:text-gray-300">
                             Fittable compares the resume against the job
                             description, highlighting areas of strength and
                             potential gaps.
@@ -116,16 +135,20 @@ import {
                     </div>
 
                     <!-- Step 3 -->
-                    <div class="border px-6 py-6 text-center">
+                    <div
+                        class="border px-6 py-6 text-center dark:border-gray-700 dark:bg-gray-800"
+                    >
                         <div
                             class="mx-auto mb-6 flex items-center justify-center rounded-xl"
                         >
                             <Target class="h-8 w-8 text-primary" />
                         </div>
-                        <h3 class="mb-3 text-xl font-bold text-gray-900">
+                        <h3
+                            class="mb-3 text-xl font-bold text-gray-900 dark:text-white"
+                        >
                             Find The Ideal Role
                         </h3>
-                        <p class="text-gray-600">
+                        <p class="text-gray-600 dark:text-gray-300">
                             Discover roles that align with your skills and
                             career goals, maximizing your chances of success.
                         </p>
@@ -138,36 +161,48 @@ import {
         <section class="container mx-auto px-6 py-20">
             <div class="grid items-center gap-12 lg:grid-cols-2">
                 <div>
-                    <h2 class="mb-6 text-4xl font-bold text-gray-900">
+                    <h2
+                        class="mb-6 text-4xl font-bold text-gray-900 dark:text-white"
+                    >
                         Visual skill matching
                     </h2>
-                    <p class="mb-6 text-gray-600">
+                    <p class="mb-6 text-gray-600 dark:text-gray-300">
                         See exactly how your skills align with job requirements
                         through clear visual representations. Identify your
                         strengths and areas for growth at a glance.
                     </p>
                     <div class="space-y-3">
-                        <div class="flex items-center gap-2 text-gray-700">
-                            <CheckCircle class="h-5 w-5 text-green-600" />
+                        <div
+                            class="flex items-center gap-2 text-gray-700 dark:text-gray-300"
+                        >
+                            <CheckCircle
+                                class="h-5 w-5 text-green-600 dark:text-green-400"
+                            />
                             <span>Interactive skill charts</span>
                         </div>
-                        <div class="flex items-center gap-2 text-gray-700">
-                            <CheckCircle class="h-5 w-5 text-green-600" />
+                        <div
+                            class="flex items-center gap-2 text-gray-700 dark:text-gray-300"
+                        >
+                            <CheckCircle
+                                class="h-5 w-5 text-green-600 dark:text-green-400"
+                            />
                             <span>Clear match percentages</span>
                         </div>
-                        <div class="flex items-center gap-2 text-gray-700">
-                            <CheckCircle class="h-5 w-5 text-green-600" />
+                        <div
+                            class="flex items-center gap-2 text-gray-700 dark:text-gray-300"
+                        >
+                            <CheckCircle
+                                class="h-5 w-5 text-green-600 dark:text-green-400"
+                            />
                             <span>Personalized recommendations</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Radar Chart Visual -->
-                <div
-                    class="rounded-3xl bg-gradient-to-br from-slate-500 to-slate-700 p-12"
-                >
+                <div class="bg-[#2a1a4a] p-12">
                     <div
-                        class="relative rounded-xl border border-gray-100 bg-white p-8 shadow-sm"
+                        class="relative border-2 border-dashed border-[#e900ff] p-8 shadow-sm"
                     >
                         <div class="mb-8 flex items-center">
                             <div
@@ -285,18 +320,18 @@ import {
         </section>
 
         <!-- For Employers -->
-        <section class="bg-white py-20">
+        <section class="bg-white py-20 dark:bg-gray-900">
             <div class="container mx-auto px-6">
                 <div class="grid items-center gap-12 lg:grid-cols-2">
                     <!-- Candidate List Visual -->
                     <div
-                        class="space-y-4 rounded-3xl bg-gradient-to-br from-slate-500 to-slate-700 p-12"
+                        class="space-y-4 border-2 border-dashed border-[#e900ff] bg-[#2a1a4a] p-12"
                     >
                         <div
                             class="flex items-center gap-3 text-sm text-gray-600"
                         >
                             <div
-                                class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100"
+                                class="flex h-8 w-8 items-center justify-center bg-blue-100 px-10 py-8"
                             >
                                 <span class="text-xs">🔍</span>
                             </div>
@@ -352,25 +387,39 @@ import {
                     </div>
 
                     <div class="">
-                        <h2 class="mb-6 text-4xl font-bold text-gray-900">
+                        <h2
+                            class="mb-6 text-4xl font-bold text-gray-900 dark:text-white"
+                        >
                             For recruiters
                         </h2>
-                        <p class="mb-6 text-gray-600">
+                        <p class="mb-6 text-gray-600 dark:text-gray-300">
                             Find the perfect candidates with our intelligent
                             resume filtering tool. Quickly identify candidates
                             whose skills align with your job requirements.
                         </p>
                         <div class="space-y-3">
-                            <div class="flex items-center gap-2 text-gray-700">
-                                <CheckCircle class="h-5 w-5 text-blue-600" />
+                            <div
+                                class="flex items-center gap-2 text-gray-700 dark:text-gray-300"
+                            >
+                                <CheckCircle
+                                    class="h-5 w-5 text-blue-600 dark:text-blue-400"
+                                />
                                 <span>Filter by skills and experience</span>
                             </div>
-                            <div class="flex items-center gap-2 text-gray-700">
-                                <CheckCircle class="h-5 w-5 text-blue-600" />
+                            <div
+                                class="flex items-center gap-2 text-gray-700 dark:text-gray-300"
+                            >
+                                <CheckCircle
+                                    class="h-5 w-5 text-blue-600 dark:text-blue-400"
+                                />
                                 <span>See match scores at a glance</span>
                             </div>
-                            <div class="flex items-center gap-2 text-gray-700">
-                                <CheckCircle class="h-5 w-5 text-blue-600" />
+                            <div
+                                class="flex items-center gap-2 text-gray-700 dark:text-gray-300"
+                            >
+                                <CheckCircle
+                                    class="h-5 w-5 text-blue-600 dark:text-blue-400"
+                                />
                                 <span>Save time in the hiring process</span>
                             </div>
                         </div>
@@ -380,10 +429,10 @@ import {
         </section>
 
         <!-- CTA Section -->
-        <section class="bg-gradient-to-r from-slate-600 to-slate-800 py-20">
+        <section class="bg-gradient-to-br from-black to-[#2a1a4a] py-20">
             <div class="container mx-auto px-6 text-center">
                 <h2 class="mb-4 text-3xl font-bold text-white">
-                    Start your journey with Fittable towards the ideal career
+                    Start your journey with Fittable towards your ideal career
                     path!
                 </h2>
                 <p class="mb-8 text-blue-100">
@@ -414,11 +463,13 @@ import {
         </section>
 
         <!-- Footer -->
-        <footer class="border-t bg-white py-8">
+        <footer
+            class="border-t bg-white py-8 dark:border-gray-800 dark:bg-gray-900"
+        >
             <div class="container mx-auto px-6">
                 <div class="flex flex-wrap items-center justify-between gap-4">
-                    <div class="text-sm text-gray-600">
-                        <strong class="font-bold text-gray-900"
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                        <strong class="font-bold text-gray-900 dark:text-white"
                             >Fittable</strong
                         >
                         <span class="ml-2">© 2025 All rights reserved</span>
@@ -426,27 +477,27 @@ import {
                     <nav class="flex flex-wrap gap-6">
                         <Link
                             href="#"
-                            class="text-sm text-gray-600 hover:text-gray-900"
+                            class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                             >Home</Link
                         >
                         <Link
                             href="#"
-                            class="text-sm text-gray-600 hover:text-gray-900"
+                            class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                             >Jobs</Link
                         >
                         <Link
                             href="#"
-                            class="text-sm text-gray-600 hover:text-gray-900"
+                            class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                             >Match</Link
                         >
                         <Link
                             href="#"
-                            class="text-sm text-gray-600 hover:text-gray-900"
+                            class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                             >Employers</Link
                         >
                         <Link
                             href="#"
-                            class="text-sm text-gray-600 hover:text-gray-900"
+                            class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                             >Privacy</Link
                         >
                     </nav>

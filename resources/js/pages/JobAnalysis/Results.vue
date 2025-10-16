@@ -57,9 +57,16 @@ interface Analysis {
     hiringProcess: string;
 }
 
+interface UserResume {
+    id: number;
+    resume_text: string;
+}
+
 const props = defineProps<{
     analysis: Analysis;
     originalText: string;
+    jobPostingId?: number;
+    userResume?: UserResume | null;
 }>();
 
 const isResumeModalOpen = ref(false);
@@ -71,6 +78,7 @@ const resumeForm = useForm({
     jobAdText: props.originalText,
     jobTitle: props.analysis.jobTitle,
     company: props.analysis.company,
+    jobPostingId: props.jobPostingId,
 });
 
 const handleFileChange = (event: Event) => {
@@ -81,12 +89,24 @@ const handleFileChange = (event: Event) => {
     }
 };
 
+const handleAssessResume = () => {
+    // If user has an existing resume, automatically submit with it
+    if (props.userResume) {
+        resumeForm.resumeText = props.userResume.resume_text;
+        submitResume();
+    } else {
+        // Otherwise, show the modal to paste/upload resume
+        isResumeModalOpen.value = true;
+    }
+};
+
 const submitResume = () => {
     // Only send the data that's actually filled in
     const data: any = {
         jobAdText: resumeForm.jobAdText,
         jobTitle: resumeForm.jobTitle,
         company: resumeForm.company,
+        jobPostingId: resumeForm.jobPostingId,
     };
 
     // Add either resume text or file, not both
@@ -109,25 +129,6 @@ const submitResume = () => {
                 console.error('Resume submission errors:', errors);
             },
         });
-};
-
-const getPriorityLabel = (importance: number) => {
-    if (importance >= 80) return 'High Priority';
-    if (importance >= 50) return 'Medium Priority';
-    return 'Low Priority';
-};
-
-const getPriorityColor = (importance: number) => {
-    if (importance >= 80) return 'bg-red-50 text-red-700 border-red-200';
-    if (importance >= 50)
-        return 'bg-yellow-50 text-yellow-700 border-yellow-200';
-    return 'bg-green-50 text-green-700 border-green-200';
-};
-
-const getCheckColor = (importance: number) => {
-    if (importance >= 80) return 'text-red-600';
-    if (importance >= 50) return 'text-yellow-600';
-    return 'text-green-600';
 };
 
 const getRequirementColor = (index: number) => {
@@ -204,10 +205,15 @@ const breadcrumbs: BreadcrumbItem[] = [
                     <Button
                         size="lg"
                         class="gap-2 bg-white text-[#e900ff] hover:bg-gray-100"
-                        @click="isResumeModalOpen = true"
+                        :disabled="resumeForm.processing"
+                        @click="handleAssessResume"
                     >
                         <FileText class="h-5 w-5" />
-                        Assess Your Resume Against This Job
+                        {{
+                            resumeForm.processing
+                                ? 'Analyzing...'
+                                : 'Assess Resume for this Job'
+                        }}
                     </Button>
                 </div>
 
@@ -366,93 +372,116 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </div>
                 </div>
 
-                <!-- Two Column Layout: Hiring Process & Benefits -->
-                <div class="mb-8 grid gap-6 lg:grid-cols-2">
-                    <!-- Hiring Process -->
-                    <div
-                        v-if="
-                            analysis.hiringProcess &&
-                            analysis.hiringProcess !== 'Not specified'
-                        "
-                        class="border-2 border-gray-700 bg-[#2a2d3e] p-8"
-                    >
-                        <h3 class="mb-4 text-xl font-bold text-white">
-                            Hiring Process
-                        </h3>
-                        <p class="text-sm leading-relaxed text-gray-300">
-                            {{ analysis.hiringProcess }}
-                        </p>
+                                <!-- Key Responsibilities -->
+                <div class="mb-8 border-2 border-gray-700 bg-[#2a2d3e] p-8">
+                    <h2 class="mb-4 text-2xl font-bold text-white">
+                        Key Responsibilities
+                    </h2>
+                    <div class="space-y-4">
+                        <div
+                            v-for="(resp, index) in analysis.responsibilities"
+                            :key="index"
+                            class="border-l-4 bg-[#1a1d2e] p-4"
+                            :class="{
+                                'border-red-500':
+                                    resp.importance && resp.importance >= 80,
+                                'border-orange-500':
+                                    resp.importance &&
+                                    resp.importance >= 50 &&
+                                    resp.importance < 80,
+                                'border-blue-500':
+                                    resp.importance && resp.importance < 50,
+                                'border-gray-500': !resp.importance,
+                            }"
+                        >
+                            <div class="mb-2 flex items-center gap-2">
+                                <CheckCircle
+                                    class="h-5 w-5"
+                                    :class="{
+                                        'text-red-500':
+                                            resp.importance &&
+                                            resp.importance >= 80,
+                                        'text-orange-500':
+                                            resp.importance &&
+                                            resp.importance >= 50 &&
+                                            resp.importance < 80,
+                                        'text-blue-500':
+                                            resp.importance &&
+                                            resp.importance < 50,
+                                        'text-gray-500': !resp.importance,
+                                    }"
+                                />
+                                <h3 class="font-bold text-white">
+                                    {{ resp.title }}
+                                </h3>
+                                <Badge
+                                    v-if="resp.importance"
+                                    variant="outline"
+                                    class="ml-auto text-xs"
+                                    :class="{
+                                        'border-red-500 bg-red-500/10 text-red-400':
+                                            resp.importance >= 80,
+                                        'border-orange-500 bg-orange-500/10 text-orange-400':
+                                            resp.importance >= 50 &&
+                                            resp.importance < 80,
+                                        'border-blue-500 bg-blue-500/10 text-blue-400':
+                                            resp.importance < 50,
+                                    }"
+                                >
+                                    {{
+                                        resp.importance >= 80
+                                            ? 'Critical'
+                                            : resp.importance >= 50
+                                              ? 'Important'
+                                              : 'Standard'
+                                    }}
+                                </Badge>
+                            </div>
+                            <p class="text-sm text-gray-300">
+                                {{ resp.description }}
+                            </p>
+                        </div>
                     </div>
+                </div>
 
+                <div class="mb-8 grid gap-6">
                     <!-- Benefits -->
                     <div
                         v-if="analysis.benefits.length > 0"
-                        class="border-2 border-gray-700 bg-[#2a2d3e] p-8"
+                        class="mb-8 border-2 border-gray-700 bg-[#2a2d3e] p-8"
                     >
-                        <h3 class="mb-4 text-xl font-bold text-white">
-                            Benefits & Perks
-                        </h3>
-                        <div class="space-y-2.5">
-                            <div
+                        <h2 class="mb-4 text-2xl font-bold text-white">Benefits</h2>
+                        <ul class="space-y-2">
+                            <li
                                 v-for="(benefit, index) in analysis.benefits"
                                 :key="index"
-                                class="flex items-start gap-2 text-sm"
+                                class="flex items-start gap-2 text-gray-300"
                             >
                                 <CheckCircle
-                                    class="mt-0.5 h-4 w-4 shrink-0 text-green-500"
+                                    class="mt-1 h-4 w-4 flex-shrink-0 text-green-400"
                                 />
-                                <span class="text-gray-300">{{ benefit }}</span>
-                            </div>
-                        </div>
+                                <span>{{ benefit }}</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Hiring Process -->
+                    <div
+                        v-if="analysis.hiringProcess"
+                        class="border-2 border-gray-700 bg-[#2a2d3e] p-8"
+                    >
+                        <h2
+                            class="mb-4 flex items-center gap-2 text-2xl font-bold text-white"
+                        >
+                            <Clock class="h-6 w-6 text-[#e900ff]" />
+                            Hiring Process
+                        </h2>
+                        <p class="leading-relaxed text-gray-300">
+                            {{ analysis.hiringProcess }}
+                        </p>
                     </div>
                 </div>
 
-                <!-- Key Responsibilities -->
-                <div class="mb-8 border-2 border-gray-700 bg-[#2a2d3e] p-8">
-                    <h3 class="mb-4 text-xl font-bold text-white">
-                        Key Responsibilities
-                    </h3>
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div
-                            v-for="(
-                                responsibility, index
-                            ) in analysis.responsibilities"
-                            :key="index"
-                            class="flex flex-col gap-3 border-2 border-gray-600 bg-[#1a1d2e] p-5"
-                        >
-                            <div class="flex items-start gap-3">
-                                <CheckCircle
-                                    :class="
-                                        getCheckColor(responsibility.importance)
-                                    "
-                                    class="mt-0.5 h-5 w-5 shrink-0"
-                                />
-                                <div class="flex-1">
-                                    <h4
-                                        class="mb-1 text-base font-semibold text-white"
-                                    >
-                                        {{ responsibility.title }}
-                                    </h4>
-                                    <p
-                                        class="text-sm leading-relaxed text-gray-300"
-                                    >
-                                        {{ responsibility.description }}
-                                    </p>
-                                </div>
-                            </div>
-                            <Badge
-                                :class="
-                                    getPriorityColor(responsibility.importance)
-                                "
-                                class="w-fit border-2 px-3 py-1 text-xs font-medium"
-                            >
-                                {{
-                                    getPriorityLabel(responsibility.importance)
-                                }}
-                            </Badge>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Resume Assessment Modal -->

@@ -11,7 +11,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+
 import { index as assessmentsIndex } from '@/routes/assessments';
 import { index as analyze } from '@/routes/job';
 import { index as jobPostingsIndex } from '@/routes/job-postings';
@@ -78,7 +78,7 @@ const mainNavItems: NavItem[] = isJobSeeker ? jobSeekerNav : recruiterNav;
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
                         <Link
-                            :href="dashboard()"
+                            :href="analyze()"
                             class="flex items-center justify-center"
                         >
                             <AppLogo />

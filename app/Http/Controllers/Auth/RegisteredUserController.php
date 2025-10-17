@@ -53,6 +53,6 @@ class RegisteredUserController extends Controller
             return redirect()->route('job.analyze.process');
         }
 
-        return to_route('dashboard');
+        return to_route('job.analyze');
     }
 }

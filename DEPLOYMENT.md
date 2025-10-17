@@ -5,6 +5,7 @@
 - A Sevalla/Render account
 - A Git repository with your code
 - A Gemini API key
+- Node.js 20.19+ or 22.12+ (automatically configured via .node-version file)
 
 ## Deployment Steps
 
@@ -157,8 +158,17 @@ Enable automatic database backups in your Sevalla dashboard under Database setti
 
 If the build fails, check:
 1. PHP version is 8.2+ in your `composer.json`
-2. All required extensions are available
-3. Build script has execute permissions: `chmod +x bin/render-build.sh`
+2. Node.js version is 20.19+ or 22.12+ (check `.node-version` file)
+3. All required extensions are available
+4. Build script has execute permissions: `chmod +x bin/render-build.sh`
+
+### Node.js Version Error
+
+If you see "Vite requires Node.js version 20.19+ or 22.12+":
+1. The `.node-version` file specifies Node 20.19.0
+2. The `NODE_VERSION` environment variable is set in render.yaml
+3. Render/Sevalla should automatically use this version
+4. If not, manually set `NODE_VERSION=20.19.0` in your environment variables
 
 ### Database Connection Issues
 

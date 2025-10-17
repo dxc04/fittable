@@ -14,7 +14,7 @@ interface Resume {
     assessments_count: number;
 }
 
-const props = defineProps<{
+defineProps<{
     resumes: Resume[];
 }>();
 

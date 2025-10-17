@@ -23,7 +23,6 @@ import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
 
 const page = usePage();
-const user = computed(() => page.props.auth.user);
 const userRoles = computed(() => page.props.auth.user?.roles || []);
 const isJobSeeker = computed(() => userRoles.value.includes('job_seeker'));
 
@@ -68,7 +67,7 @@ const recruiterNav: NavItem[] = [
     },
 ];
 
-const mainNavItems: NavItem[] = isJobSeeker ? jobSeekerNav : recruiterNav;
+const mainNavItems: NavItem[] = isJobSeeker.value ? jobSeekerNav : recruiterNav;
 </script>
 
 <template>

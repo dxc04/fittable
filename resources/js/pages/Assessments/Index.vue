@@ -18,7 +18,7 @@ interface Assessment {
     };
 }
 
-const props = defineProps<{
+defineProps<{
     assessments: Assessment[];
 }>();
 

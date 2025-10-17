@@ -157,13 +157,23 @@ The application requires email verification for all new users. To configure:
 
 ### Queue Worker
 
-For background job processing (resume analysis, etc.), you'll need to add a background worker:
+For background job processing (resume analysis, etc.), the worker is configured in `render.yaml`:
 
-1. In your Sevalla dashboard, create a new **Background Worker**
-2. Use this start command:
-   ```bash
-   php artisan queue:work --tries=3 --timeout=300
-   ```
+1. The worker service will be automatically created from `render.yaml`
+2. **Important**: Set the same environment variables for the worker:
+   - `APP_KEY` - Copy from web service
+   - `DB_URL` - Your NeonDB connection string
+   - All other variables are pre-configured
+
+3. **After deploying the worker**, if you see cache/database errors:
+   - The worker needs the same database access as the web service
+   - Ensure migrations were run on the web service first
+   - The worker will automatically connect to the same database
+
+**Note**: If you created the worker manually before `render.yaml` was updated:
+- Delete the manual worker
+- Redeploy to create it from `render.yaml`
+- Or update the manual worker's start command to: `php artisan queue:work --tries=3 --timeout=300`
 
 ### File Storage
 

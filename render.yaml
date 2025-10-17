@@ -23,10 +23,18 @@ services:
         value: database
       - key: CACHE_STORE
         value: database
+      - key: CACHE_DRIVER
+        value: database
       - key: QUEUE_CONNECTION
         value: database
       - key: DB_CONNECTION
         value: pgsql
+      - key: DB_CACHE_CONNECTION
+        value: pgsql
+      - key: DB_CACHE_LOCK_CONNECTION
+        value: pgsql
+      - key: DB_CACHE_LOCK_TABLE
+        value: cache_locks
       # For external NeonDB, use DB_URL instead:
       - key: DB_URL
         sync: false  # Set this manually in Render dashboard with your NeonDB connection string
@@ -41,6 +49,38 @@ services:
       #   value: your-username
       # - key: DB_PASSWORD
       #   value: your-password
+
+  - type: worker
+    name: fittable-worker
+    runtime: php
+    plan: starter
+    buildCommand: "composer install --no-dev --optimize-autoloader"
+    startCommand: "php artisan queue:work --tries=3 --timeout=300"
+    envVars:
+      - key: APP_KEY
+        sync: false  # Sync from web service
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: LOG_CHANNEL
+        value: errorlog
+      - key: CACHE_STORE
+        value: database
+      - key: CACHE_DRIVER
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_CACHE_CONNECTION
+        value: pgsql
+      - key: DB_CACHE_LOCK_CONNECTION
+        value: pgsql
+      - key: DB_CACHE_LOCK_TABLE
+        value: cache_locks
+      - key: DB_URL
+        sync: false  # Set this manually with your NeonDB connection string
 
 # Note: For NeonDB (external PostgreSQL), remove the databases section below
 # and configure DB_URL in Render dashboard with your NeonDB connection string

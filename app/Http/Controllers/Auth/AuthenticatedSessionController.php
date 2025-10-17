@@ -50,7 +50,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('job.analyze.process');
         }
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('job.index', absolute: false));
     }
 
     /**

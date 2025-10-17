@@ -87,9 +87,39 @@ MAIL_FROM_NAME="${APP_NAME}"
 After the first successful deployment:
 
 1. Verify the application is running at your Sevalla URL
-2. Test the registration and login functionality
-3. **Configure email verification** - Users must verify their email before accessing protected features
-4. Test the job analysis feature with your Gemini API key
+2. **Run migrations manually if needed** - If you see database errors:
+   - Go to Render Shell (or connect via SSH)
+   - Run: `php artisan migrate --force`
+   - Run: `php artisan db:seed --class=RoleAndPermissionSeeder --force`
+3. Test the registration and login functionality
+4. **Configure email verification** - Users must verify their email before accessing protected features
+5. Test the job analysis feature with your Gemini API key
+
+### 6a. Manual Database Setup (if migrations fail during build)
+
+If the build completes but you get database errors like "relation does not exist":
+
+1. **Access the Render Shell**:
+   - Go to your Sevalla/Render dashboard
+   - Click on your web service
+   - Click "Shell" in the top navigation
+
+2. **Run migrations**:
+   ```bash
+   php artisan migrate --force
+   ```
+
+3. **Seed roles and permissions**:
+   ```bash
+   php artisan db:seed --class=RoleAndPermissionSeeder --force
+   ```
+
+4. **Clear caches**:
+   ```bash
+   php artisan config:clear
+   php artisan cache:clear
+   php artisan config:cache
+   ```
 
 ### 7. Email Verification Setup
 
@@ -177,6 +207,32 @@ If you see "Vite requires Node.js version 20.19+ or 22.12+":
 3. Ensure connection string includes `?sslmode=require` parameter
 4. Try running migrations manually: `php artisan migrate --force`
 5. Check NeonDB dashboard for connection limits and usage
+
+### Cache Table Error ("relation cache does not exist")
+
+This error occurs when the cache table hasn't been created:
+
+1. **Access Render Shell** and run migrations:
+   ```bash
+   php artisan migrate --force
+   ```
+
+2. **Verify tables were created**:
+   ```bash
+   php artisan tinker
+   >>> DB::table('cache')->count()
+   ```
+
+3. **If migrations won't run during build** (common issue):
+   - The database might not be accessible during the build phase
+   - Migrations must be run manually after the first deployment
+   - Subsequent deployments will work normally
+
+4. **Alternative: Use file cache for initial deployment**:
+   - Temporarily set `CACHE_STORE=file` in environment variables
+   - Deploy successfully
+   - Run migrations manually
+   - Change `CACHE_STORE` back to `database`
 
 ### Assets Not Loading
 

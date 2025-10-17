@@ -2,26 +2,30 @@
 # exit on error
 set -o errexit
 
-# Install Composer dependencies
+echo "==> Installing Composer dependencies..."
 composer install --no-dev --optimize-autoloader
 
-# Install Node dependencies and build assets
+echo "==> Installing Node dependencies and building assets..."
 npm ci
 npm run build
 
-# Generate application key if not set
+echo "==> Generating application key..."
 php artisan key:generate --force
 
-# Run database migrations
-php artisan migrate --force
+echo "==> Running database migrations..."
+# Run migrations - if this fails, database might not be configured yet
+php artisan migrate --force || echo "Warning: Migrations failed. You may need to run them manually after deployment."
 
-# Seed roles and permissions
-php artisan db:seed --class=RoleAndPermissionSeeder --force
+echo "==> Seeding roles and permissions..."
+# Seed roles - if this fails, database might not be configured yet
+php artisan db:seed --class=RoleAndPermissionSeeder --force || echo "Warning: Seeding failed. You may need to seed manually after deployment."
 
-# Clear and cache config
+echo "==> Caching configuration..."
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Link storage
-php artisan storage:link
+echo "==> Linking storage..."
+php artisan storage:link || echo "Warning: Storage link failed."
+
+echo "==> Build complete!"

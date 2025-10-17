@@ -13,11 +13,11 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/analyze', [JobAnalysisController::class, 'index'])->name('job.index');
+Route::post('/analyze', [JobAnalysisController::class, 'analyze'])->name('job.analyze');
 Route::get('/recruiter', [RecruiterController::class, 'index'])->name('recruiter.index');
 Route::post('/recruiter/match', [RecruiterController::class, 'calculateMatch'])->name('recruiter.match');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::post('/analyze', [JobAnalysisController::class, 'analyze'])->name('job.analyze');
     Route::get('/analyze/process', [JobAnalysisController::class, 'processPendingAnalysis'])->name('job.analyze.process');
     Route::post('/assess-resume', [JobAnalysisController::class, 'assessResume'])->name('job.assessResume');
     Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments.index');

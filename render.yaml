@@ -21,29 +21,25 @@ services:
       - key: QUEUE_CONNECTION
         value: database
       - key: DB_CONNECTION
-        value: mysql
-      - key: DB_HOST
-        fromDatabase:
-          name: fittable-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: fittable-db
-          property: port
-      - key: DB_DATABASE
-        fromDatabase:
-          name: fittable-db
-          property: database
-      - key: DB_USERNAME
-        fromDatabase:
-          name: fittable-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: fittable-db
-          property: password
+        value: pgsql
+      # For external NeonDB, use DB_URL instead:
+      - key: DB_URL
+        sync: false  # Set this manually in Render dashboard with your NeonDB connection string
+      # Or use individual connection parameters:
+      # - key: DB_HOST
+      #   value: your-neondb-host.neon.tech
+      # - key: DB_PORT
+      #   value: 5432
+      # - key: DB_DATABASE
+      #   value: fittable
+      # - key: DB_USERNAME
+      #   value: your-username
+      # - key: DB_PASSWORD
+      #   value: your-password
 
-databases:
-  - name: fittable-db
-    databaseName: fittable
-    user: fittable
+# Note: For NeonDB (external PostgreSQL), remove the databases section below
+# and configure DB_URL in Render dashboard with your NeonDB connection string
+# databases:
+#   - name: fittable-db
+#     databaseName: fittable
+#     user: fittable

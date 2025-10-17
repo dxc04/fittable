@@ -325,7 +325,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 
                 <!-- Summary Section -->
                 <div class="mb-8 border-2 border-gray-700 bg-[#2a2d3e] p-8">
-                    <h2 class="mb-4 text-2xl font-bold text-white">About the Role</h2>
+                    <h2 class="mb-4 text-2xl font-bold text-white">
+                        About the Role
+                    </h2>
                     <p class="leading-relaxed text-gray-300">
                         {{ analysis.summary }}
                     </p>
@@ -432,7 +434,6 @@ const breadcrumbs: BreadcrumbItem[] = [
                         </div>
                     </div>
                 </div>
-
 
                 <!-- Responsibilities -->
                 <div class="mb-8 border-2 border-gray-700 bg-[#2a2d3e] p-8">

@@ -372,7 +372,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </div>
                 </div>
 
-                                <!-- Key Responsibilities -->
+                <!-- Key Responsibilities -->
                 <div class="mb-8 border-2 border-gray-700 bg-[#2a2d3e] p-8">
                     <h2 class="mb-4 text-2xl font-bold text-white">
                         Key Responsibilities
@@ -450,7 +450,9 @@ const breadcrumbs: BreadcrumbItem[] = [
                         v-if="analysis.benefits.length > 0"
                         class="mb-8 border-2 border-gray-700 bg-[#2a2d3e] p-8"
                     >
-                        <h2 class="mb-4 text-2xl font-bold text-white">Benefits</h2>
+                        <h2 class="mb-4 text-2xl font-bold text-white">
+                            Benefits
+                        </h2>
                         <ul class="space-y-2">
                             <li
                                 v-for="(benefit, index) in analysis.benefits"
@@ -481,7 +483,6 @@ const breadcrumbs: BreadcrumbItem[] = [
                         </p>
                     </div>
                 </div>
-
             </div>
 
             <!-- Resume Assessment Modal -->

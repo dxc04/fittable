@@ -95,7 +95,7 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'require',
-            'channel_binding' => 'require'
+            'channel_binding' => 'require',
         ],
 
         'sqlsrv' => [

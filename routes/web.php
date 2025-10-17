@@ -13,16 +13,13 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/analyze', [JobAnalysisController::class, 'index'])->name('job.index');
-Route::post('/analyze', [JobAnalysisController::class, 'analyze'])->name('job.analyze');
-Route::middleware('auth')->group(function () {
-    Route::get('/analyze/process', [JobAnalysisController::class, 'processPendingAnalysis'])->name('job.analyze.process');
-    Route::post('/assess-resume', [JobAnalysisController::class, 'assessResume'])->name('job.assessResume');
-});
-
 Route::get('/recruiter', [RecruiterController::class, 'index'])->name('recruiter.index');
 Route::post('/recruiter/match', [RecruiterController::class, 'calculateMatch'])->name('recruiter.match');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/analyze', [JobAnalysisController::class, 'analyze'])->name('job.analyze');
+    Route::get('/analyze/process', [JobAnalysisController::class, 'processPendingAnalysis'])->name('job.analyze.process');
+    Route::post('/assess-resume', [JobAnalysisController::class, 'assessResume'])->name('job.assessResume');
     Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments.index');
     Route::get('/assessments/{assessment}', [AssessmentController::class, 'show'])->name('assessments.show');
     Route::get('/job-postings', [JobPostingController::class, 'index'])->name('job-postings.index');
@@ -30,10 +27,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/resumes', [ResumeController::class, 'index'])->name('resumes.index');
     Route::get('/resumes/{resume}', [ResumeController::class, 'show'])->name('resumes.show');
 });
-
-Route::get('dashboard', function () {
-    return redirect()->route('job.index');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

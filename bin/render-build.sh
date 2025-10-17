@@ -12,15 +12,10 @@ npm run build
 echo "==> Generating application key..."
 php artisan key:generate --force
 
-echo "==> Running database migrations..."
-# Run migrations - if this fails, database might not be configured yet
-php artisan migrate --force || echo "Warning: Migrations failed. You may need to run them manually after deployment."
-
-echo "==> Seeding roles and permissions..."
-# Seed roles - if this fails, database might not be configured yet
-php artisan db:seed --class=RoleAndPermissionSeeder --force || echo "Warning: Seeding failed. You may need to seed manually after deployment."
-
 echo "==> Caching configuration..."
+# Note: Database migrations are NOT run during build
+# They must be run manually after deployment via bin/post-deploy.sh
+# This is because the database is not accessible during the build phase
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache

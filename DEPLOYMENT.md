@@ -190,14 +190,15 @@ If you see "Vite requires Node.js version 20.19+ or 22.12+":
 2. Check API key is valid and has sufficient quota
 3. Monitor API usage in Google AI Studio
 
-## Alternative Deployment (Heroku-style)
+## Important Notes About Web Server
 
-If using a Heroku-style platform, the `Procfile` is already configured:
+This application uses `php artisan serve` as defined in `render.yaml`. This is suitable for:
+- Development environments
+- Small production deployments on Render/Sevalla
 
-```
-web: vendor/bin/heroku-php-apache2 public/
-worker: php artisan queue:work --tries=3 --timeout=300
-```
+For high-traffic production environments, consider:
+- Using Render's native PHP runtime (no configuration needed)
+- Or deploying to a platform with Nginx/Apache (Heroku, Laravel Forge, etc.)
 
 ## Updating Your Deployment
 

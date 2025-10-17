@@ -13,7 +13,7 @@ echo "==> Generating application key..."
 php artisan key:generate --force
 
 echo "==> Running database migrations..."
-php artisan migrate:fresh --force
+php artisan migrate --force
 
 echo "==> Seeding roles and permissions..."
 php artisan db:seed --class=RoleAndPermissionSeeder --force

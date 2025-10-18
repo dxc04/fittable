@@ -35,20 +35,29 @@ services:
         value: pgsql
       - key: DB_CACHE_LOCK_TABLE
         value: cache_locks
-      # For external NeonDB, use DB_URL instead:
+      # Database (NeonDB)
       - key: DB_URL
         sync: false  # Set this manually in Render dashboard with your NeonDB connection string
-      # Or use individual connection parameters:
-      # - key: DB_HOST
-      #   value: your-neondb-host.neon.tech
-      # - key: DB_PORT
-      #   value: 5432
-      # - key: DB_DATABASE
-      #   value: fittable
-      # - key: DB_USERNAME
-      #   value: your-username
-      # - key: DB_PASSWORD
-      #   value: your-password
+      # Email (SendGrid)
+      - key: MAIL_MAILER
+        value: smtp
+      - key: MAIL_HOST
+        value: smtp.sendgrid.net
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USERNAME
+        value: apikey
+      - key: MAIL_PASSWORD
+        sync: false  # Set this manually in Render dashboard with your SendGrid API key
+      - key: MAIL_ENCRYPTION
+        value: tls
+      - key: MAIL_FROM_ADDRESS
+        sync: false  # Set to your verified sender email (e.g., noreply@yourdomain.com)
+      - key: MAIL_FROM_NAME
+        value: Fittable
+      # AI Service
+      - key: GEMINI_API_KEY
+        sync: false  # Set this manually in Render dashboard
 
   - type: worker
     name: fittable-worker
@@ -81,6 +90,26 @@ services:
         value: cache_locks
       - key: DB_URL
         sync: false  # Set this manually with your NeonDB connection string
+      # Email (SendGrid) - needed for queued email jobs
+      - key: MAIL_MAILER
+        value: smtp
+      - key: MAIL_HOST
+        value: smtp.sendgrid.net
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USERNAME
+        value: apikey
+      - key: MAIL_PASSWORD
+        sync: false  # Sync from web service
+      - key: MAIL_ENCRYPTION
+        value: tls
+      - key: MAIL_FROM_ADDRESS
+        sync: false  # Sync from web service
+      - key: MAIL_FROM_NAME
+        value: Fittable
+      # AI Service - needed for queued AI jobs
+      - key: GEMINI_API_KEY
+        sync: false  # Sync from web service
 
 # Note: For NeonDB (external PostgreSQL), remove the databases section below
 # and configure DB_URL in Render dashboard with your NeonDB connection string

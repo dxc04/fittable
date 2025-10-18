@@ -18,7 +18,9 @@ services:
       - key: APP_DEBUG
         value: false
       - key: LOG_CHANNEL
-        value: errorlog
+        value: stderr
+      - key: LOG_LEVEL
+        value: debug
       - key: SESSION_DRIVER
         value: database
       - key: CACHE_STORE
@@ -73,7 +75,9 @@ services:
       - key: APP_DEBUG
         value: false
       - key: LOG_CHANNEL
-        value: errorlog
+        value: stderr
+      - key: LOG_LEVEL
+        value: debug
       - key: CACHE_STORE
         value: database
       - key: CACHE_DRIVER

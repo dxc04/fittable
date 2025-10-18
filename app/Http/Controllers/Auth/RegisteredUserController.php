@@ -30,29 +30,52 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        try {
+            \Log::info('Registration attempt', ['email' => $request->email]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+                'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            ]);
 
-        event(new Registered($user));
+            \Log::info('Validation passed');
 
-        Auth::login($user);
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        $request->session()->regenerate();
+            \Log::info('User created', ['user_id' => $user->id]);
 
-        // Check if there's a pending job analysis to process
-        if ($request->session()->has('pending_job_analysis')) {
-            return redirect()->route('job.analyze.process');
+            event(new Registered($user));
+
+            \Log::info('Registered event fired');
+
+            Auth::login($user);
+
+            \Log::info('User logged in');
+
+            $request->session()->regenerate();
+
+            // Check if there's a pending job analysis to process
+            if ($request->session()->has('pending_job_analysis')) {
+                \Log::info('Redirecting to pending job analysis');
+
+                return redirect()->route('job.analyze.process');
+            }
+
+            \Log::info('Redirecting to job.analyze');
+
+            return to_route('job.analyze');
+        } catch (\Exception $e) {
+            \Log::error('Registration failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
         }
-
-        return to_route('job.analyze');
     }
 }

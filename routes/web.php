@@ -19,7 +19,7 @@ Route::post('/recruiter/match', [RecruiterController::class, 'calculateMatch'])-
 // Unauthenticated analyze POST route (redirects to register if needed)
 Route::post('/analyze', [JobAnalysisController::class, 'analyze'])->name('job.analyze');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     // Dashboard redirect to job analysis
     Route::get('dashboard', function () {
         return redirect()->route('job.index');

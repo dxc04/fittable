@@ -16,7 +16,8 @@ Route::get('/', function () {
 Route::get('/recruiter', [RecruiterController::class, 'index'])->name('recruiter.index');
 Route::post('/recruiter/match', [RecruiterController::class, 'calculateMatch'])->name('recruiter.match');
 
-// Unauthenticated analyze POST route (redirects to register if needed)
+// Public job analysis routes (accessible without authentication)
+Route::get('/analyze', [JobAnalysisController::class, 'index'])->name('job.index');
 Route::post('/analyze', [JobAnalysisController::class, 'analyze'])->name('job.analyze');
 
 Route::middleware(['auth'])->group(function () {
@@ -25,8 +26,7 @@ Route::middleware(['auth'])->group(function () {
         return redirect()->route('job.index');
     })->name('dashboard');
 
-    // Job analysis routes
-    Route::get('/analyze', [JobAnalysisController::class, 'index'])->name('job.index');
+    // Authenticated job analysis routes
     Route::get('/analyze/process', [JobAnalysisController::class, 'processPendingAnalysis'])->name('job.analyze.process');
     Route::post('/assess-resume', [JobAnalysisController::class, 'assessResume'])->name('job.assessResume');
 

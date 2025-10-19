@@ -2,9 +2,9 @@
 
 use App\Models\User;
 
-test('guests are redirected to the login page from dashboard', function () {
+test('guests can access the job analysis page', function () {
     $response = $this->get(route('job.index'));
-    $response->assertRedirect(route('login'));
+    $response->assertStatus(200);
 });
 
 test('authenticated users can visit the job analysis page (dashboard replacement)', function () {

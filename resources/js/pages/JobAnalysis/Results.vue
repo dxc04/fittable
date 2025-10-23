@@ -18,6 +18,7 @@ import { assessResume, index } from '@/routes/job';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import {
+    AlertTriangle,
     ArrowLeft,
     Briefcase,
     CheckCircle,
@@ -25,6 +26,7 @@ import {
     DollarSign,
     FileText,
     MapPin,
+    ShieldAlert,
     Upload,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -41,6 +43,12 @@ interface Requirement {
     priority: number;
 }
 
+interface Warning {
+    type: 'warning' | 'red-flag';
+    category: 'benefits' | 'compensation' | 'culture' | 'transparency' | 'expectations';
+    message: string;
+}
+
 interface Analysis {
     jobTitle: string;
     company: string;
@@ -55,6 +63,7 @@ interface Analysis {
     benefits: string[];
     salaryRange: string;
     hiringProcess: string;
+    warnings: Warning[];
 }
 
 interface UserResume {
@@ -215,6 +224,76 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 : 'Assess Resume for this Job'
                         }}
                     </Button>
+                </div>
+
+                <!-- Warnings and Red Flags -->
+                <div
+                    v-if="analysis.warnings && analysis.warnings.length > 0"
+                    class="mb-8 border-2 bg-[#2a2d3e] p-8"
+                    :class="{
+                        'border-yellow-600': !analysis.warnings.some(w => w.type === 'red-flag'),
+                        'border-red-600': analysis.warnings.some(w => w.type === 'red-flag')
+                    }"
+                >
+                    <div class="mb-4 flex items-center gap-3">
+                        <ShieldAlert
+                            class="h-7 w-7"
+                            :class="{
+                                'text-yellow-500': !analysis.warnings.some(w => w.type === 'red-flag'),
+                                'text-red-500': analysis.warnings.some(w => w.type === 'red-flag')
+                            }"
+                        />
+                        <h2 class="text-2xl font-bold text-white">
+                            Things to Consider
+                        </h2>
+                    </div>
+                    <p class="mb-6 text-sm text-gray-400">
+                        We've identified some potential concerns with this job posting that you should be aware of before applying.
+                    </p>
+                    <div class="space-y-4">
+                        <div
+                            v-for="(warning, index) in analysis.warnings"
+                            :key="index"
+                            class="border-l-4 bg-[#1a1d2e] p-4"
+                            :class="{
+                                'border-yellow-500': warning.type === 'warning',
+                                'border-red-500': warning.type === 'red-flag'
+                            }"
+                        >
+                            <div class="flex items-start gap-3">
+                                <AlertTriangle
+                                    class="mt-0.5 h-5 w-5 flex-shrink-0"
+                                    :class="{
+                                        'text-yellow-500': warning.type === 'warning',
+                                        'text-red-500': warning.type === 'red-flag'
+                                    }"
+                                />
+                                <div class="flex-1">
+                                    <div class="mb-1 flex items-center gap-2">
+                                        <Badge
+                                            variant="outline"
+                                            class="text-xs capitalize"
+                                            :class="{
+                                                'border-yellow-500 bg-yellow-500/10 text-yellow-400': warning.type === 'warning',
+                                                'border-red-500 bg-red-500/10 text-red-400': warning.type === 'red-flag'
+                                            }"
+                                        >
+                                            {{ warning.type === 'red-flag' ? 'Red Flag' : 'Warning' }}
+                                        </Badge>
+                                        <Badge
+                                            variant="outline"
+                                            class="border-gray-600 bg-gray-600/10 text-xs capitalize text-gray-400"
+                                        >
+                                            {{ warning.category }}
+                                        </Badge>
+                                    </div>
+                                    <p class="text-sm leading-relaxed text-gray-300">
+                                        {{ warning.message }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Job Overview -->

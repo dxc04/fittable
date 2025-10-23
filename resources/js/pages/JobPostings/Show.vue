@@ -15,10 +15,17 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { show as showAssessment } from '@/routes/assessments';
 import { assessResume } from '@/routes/job';
-import { index } from '@/routes/job-postings';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import {
+    close as closeJobPosting,
+    index,
+    reopen as reopenJobPosting,
+} from '@/routes/job-postings';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
+import {
+    AlertTriangle,
+    Archive,
+    ArchiveRestore,
     ArrowLeft,
     Briefcase,
     CheckCircle,
@@ -29,6 +36,7 @@ import {
     FileText,
     MapPin,
     Plus,
+    ShieldAlert,
     Upload,
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
@@ -45,6 +53,12 @@ interface Requirement {
     priority: number;
 }
 
+interface Warning {
+    type: 'warning' | 'red-flag';
+    category: 'benefits' | 'compensation' | 'culture' | 'transparency' | 'expectations';
+    message: string;
+}
+
 interface Analysis {
     jobTitle: string;
     company: string;
@@ -59,12 +73,15 @@ interface Analysis {
     benefits: string[];
     salaryRange: string;
     hiringProcess: string;
+    warnings: Warning[];
 }
 
 interface JobPosting {
     id: number;
     job_title: string;
     company: string;
+    closed_at: string | null;
+    user_id: number;
 }
 
 interface UserResume {
@@ -88,6 +105,7 @@ const props = defineProps<{
 const page = usePage();
 const userRoles = computed(() => page.props.auth.user?.roles || []);
 const isJobSeeker = computed(() => userRoles.value.includes('job_seeker'));
+const isOwner = computed(() => page.props.auth.user?.id === props.jobPosting.user_id);
 
 const isResumeModalOpen = ref(false);
 const resumeFile = ref<File | null>(null);
@@ -117,10 +135,7 @@ const assessmentForm = useForm({
     jobPostingId: props.jobPosting.id,
 });
 
-const handleNewAssessment = () => {
-    assessmentForm.resumeText = props.userResume?.resume_text || '';
-    assessmentForm.post(assessResume.url());
-};
+// Removed unused function - assessment functionality not yet implemented
 
 const handleAssessResumeClick = () => {
     isResumeModalOpen.value = true;
@@ -177,6 +192,20 @@ const submitResume = () => {
         });
 };
 
+const handleCloseJobPosting = () => {
+    if (
+        confirm(
+            'Are you sure you want to close this job posting? All related assessments will also be closed.',
+        )
+    ) {
+        router.post(closeJobPosting(props.jobPosting.id).url);
+    }
+};
+
+const handleReopenJobPosting = () => {
+    router.post(reopenJobPosting(props.jobPosting.id).url);
+};
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Job Postings',
@@ -198,9 +227,17 @@ const breadcrumbs: BreadcrumbItem[] = [
             <div class="bg-[#1e293b] px-6 py-8">
                 <div class="container mx-auto">
                     <div class="mb-6 flex items-center justify-between">
-                        <h1 class="text-4xl font-bold text-white">
-                            {{ jobPosting.job_title }}
-                        </h1>
+                        <div class="flex items-center gap-3">
+                            <h1 class="text-4xl font-bold text-white">
+                                {{ jobPosting.job_title }}
+                            </h1>
+                            <Badge
+                                v-if="jobPosting.closed_at"
+                                class="border-0 bg-gray-600 px-3 py-1 text-sm font-medium text-white"
+                            >
+                                Closed
+                            </Badge>
+                        </div>
                         <div class="flex items-center gap-2">
                             <Link :href="index().url">
                                 <Button
@@ -213,17 +250,13 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 </Button>
                             </Link>
                             <div
-                                v-if="isJobSeeker && userResume"
+                                v-if="
+                                    isJobSeeker &&
+                                    userResume &&
+                                    !jobPosting.closed_at
+                                "
                                 class="flex gap-2"
                             >
-                                <Button
-                                    @click="handleNewAssessment"
-                                    class="gap-2 bg-[#e900ff] text-white hover:bg-[#d100e6]"
-                                    :disabled="assessmentForm.processing"
-                                >
-                                    <Plus class="h-4 w-4" />
-                                    New Assessment
-                                </Button>
                                 <Button
                                     @click="handleAssessResumeClick"
                                     class="gap-2 bg-[#e900ff] text-white hover:bg-[#d100e6]"
@@ -231,6 +264,28 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 >
                                     <Plus class="h-4 w-4" />
                                     Assess Resume for this Job
+                                </Button>
+                            </div>
+                            <div v-if="isOwner" class="flex gap-2">
+                                <Button
+                                    v-if="!jobPosting.closed_at"
+                                    @click="handleCloseJobPosting"
+                                    variant="outline"
+                                    size="sm"
+                                    class="gap-2 border-gray-600 text-gray-300 hover:bg-gray-600"
+                                >
+                                    <Archive class="h-4 w-4" />
+                                    Close Job
+                                </Button>
+                                <Button
+                                    v-else
+                                    @click="handleReopenJobPosting"
+                                    variant="outline"
+                                    size="sm"
+                                    class="gap-2 border-[#e900ff] text-[#e900ff] hover:bg-[#e900ff]/10"
+                                >
+                                    <ArchiveRestore class="h-4 w-4" />
+                                    Reopen Job
                                 </Button>
                             </div>
                         </div>
@@ -307,6 +362,76 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 View Assessment
                             </Link>
                         </Button>
+                    </div>
+                </div>
+
+                <!-- Warnings and Red Flags -->
+                <div
+                    v-if="analysis.warnings && analysis.warnings.length > 0"
+                    class="mb-8 border-2 bg-[#2a2d3e] p-8"
+                    :class="{
+                        'border-yellow-600': !analysis.warnings.some(w => w.type === 'red-flag'),
+                        'border-red-600': analysis.warnings.some(w => w.type === 'red-flag')
+                    }"
+                >
+                    <div class="mb-4 flex items-center gap-3">
+                        <ShieldAlert
+                            class="h-7 w-7"
+                            :class="{
+                                'text-yellow-500': !analysis.warnings.some(w => w.type === 'red-flag'),
+                                'text-red-500': analysis.warnings.some(w => w.type === 'red-flag')
+                            }"
+                        />
+                        <h2 class="text-2xl font-bold text-white">
+                            Things to Consider
+                        </h2>
+                    </div>
+                    <p class="mb-6 text-sm text-gray-400">
+                        We've identified some potential concerns with this job posting that you should be aware of before applying.
+                    </p>
+                    <div class="space-y-4">
+                        <div
+                            v-for="(warning, index) in analysis.warnings"
+                            :key="index"
+                            class="border-l-4 bg-[#1a1d2e] p-4"
+                            :class="{
+                                'border-yellow-500': warning.type === 'warning',
+                                'border-red-500': warning.type === 'red-flag'
+                            }"
+                        >
+                            <div class="flex items-start gap-3">
+                                <AlertTriangle
+                                    class="mt-0.5 h-5 w-5 flex-shrink-0"
+                                    :class="{
+                                        'text-yellow-500': warning.type === 'warning',
+                                        'text-red-500': warning.type === 'red-flag'
+                                    }"
+                                />
+                                <div class="flex-1">
+                                    <div class="mb-1 flex items-center gap-2">
+                                        <Badge
+                                            variant="outline"
+                                            class="text-xs capitalize"
+                                            :class="{
+                                                'border-yellow-500 bg-yellow-500/10 text-yellow-400': warning.type === 'warning',
+                                                'border-red-500 bg-red-500/10 text-red-400': warning.type === 'red-flag'
+                                            }"
+                                        >
+                                            {{ warning.type === 'red-flag' ? 'Red Flag' : 'Warning' }}
+                                        </Badge>
+                                        <Badge
+                                            variant="outline"
+                                            class="border-gray-600 bg-gray-600/10 text-xs capitalize text-gray-400"
+                                        >
+                                            {{ warning.category }}
+                                        </Badge>
+                                    </div>
+                                    <p class="text-sm leading-relaxed text-gray-300">
+                                        {{ warning.message }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

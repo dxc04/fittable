@@ -65,6 +65,7 @@ class JobAnalysisController extends Controller
                         'benefits' => $jobAnalysis->benefits,
                         'salaryRange' => $jobAnalysis->salary_range,
                         'hiringProcess' => $jobAnalysis->hiring_process,
+                        'warnings' => $jobAnalysis->warnings ?? [],
                     ];
 
                     session()->forget('pending_job_analysis');
@@ -115,6 +116,7 @@ class JobAnalysisController extends Controller
                 'benefits' => $analysis['benefits'],
                 'salary_range' => $analysis['salaryRange'],
                 'hiring_process' => $analysis['hiringProcess'],
+                'warnings' => $analysis['warnings'] ?? [],
             ]);
 
             // Clear pending analysis from session
@@ -181,6 +183,7 @@ class JobAnalysisController extends Controller
                         'benefits' => $jobAnalysis->benefits,
                         'salaryRange' => $jobAnalysis->salary_range,
                         'hiringProcess' => $jobAnalysis->hiring_process,
+                        'warnings' => $jobAnalysis->warnings ?? [],
                     ];
 
                     session()->forget('pending_job_analysis');
@@ -231,6 +234,7 @@ class JobAnalysisController extends Controller
                 'benefits' => $analysis['benefits'],
                 'salary_range' => $analysis['salaryRange'],
                 'hiring_process' => $analysis['hiringProcess'],
+                'warnings' => $analysis['warnings'] ?? [],
             ]);
 
             // Clear pending analysis if exists
@@ -362,6 +366,14 @@ class JobAnalysisController extends Controller
                 'interview_preparation' => $assessment['interviewPreparation'],
                 'personalized_recommendation' => $assessment['personalizedRecommendation'],
             ]);
+
+            // Sync the user to job posting relationship
+            if ($validated['jobPostingId'] ?? null) {
+                $jobPosting = JobPosting::find($validated['jobPostingId']);
+                if ($jobPosting && ! $jobPosting->users()->where('user_id', auth()->id())->exists()) {
+                    $jobPosting->users()->attach(auth()->id());
+                }
+            }
 
             return Inertia::render('JobAnalysis/Assessment', [
                 'assessment' => $assessment,

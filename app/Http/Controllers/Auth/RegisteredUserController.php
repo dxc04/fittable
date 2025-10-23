@@ -49,6 +49,12 @@ class RegisteredUserController extends Controller
 
             \Log::info('User created', ['user_id' => $user->id]);
 
+            // Assign role based on registration flow
+            $role = $request->session()->get('registration_role', 'job_seeker');
+            $user->assignRole($role);
+
+            \Log::info('Role assigned', ['user_id' => $user->id, 'role' => $role]);
+
             event(new Registered($user));
 
             \Log::info('Registered event fired');
@@ -64,6 +70,20 @@ class RegisteredUserController extends Controller
                 \Log::info('Redirecting to pending job analysis');
 
                 return redirect()->route('job.analyze.process');
+            }
+
+            // Check if there's a pending recruiter match to process
+            if ($request->session()->has('pending_recruiter_match')) {
+                \Log::info('Redirecting to pending recruiter match');
+
+                return redirect()->route('recruiter.match.process');
+            }
+
+            // Default redirect based on role
+            if ($user->hasRole('recruiter')) {
+                \Log::info('Redirecting to recruiter.index');
+
+                return redirect()->route('recruiter.index');
             }
 
             \Log::info('Redirecting to job.analyze');

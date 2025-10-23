@@ -37,6 +37,16 @@ class JobAnalysisService
         return $this->parseAssessmentResponse($result->text());
     }
 
+    public function assessCandidateForRecruiter(string $resumeText, string $jobAdText): array
+    {
+        $prompt = $this->buildRecruiterAssessmentPrompt($resumeText, $jobAdText);
+
+        $result = Gemini::generativeModel(model: 'gemini-2.0-flash-exp')
+            ->generateContent($prompt);
+
+        return $this->parseAssessmentResponse($result->text());
+    }
+
     protected function buildAssessmentPrompt(string $resumeText, string $jobAdText): string
     {
         return <<<PROMPT
@@ -216,7 +226,10 @@ Analyze the following job advertisement and extract structured information. Retu
     ],
     "benefits": ["benefit 1", "benefit 2"],
     "salaryRange": "salary range or 'Not specified'",
-    "hiringProcess": "Brief description of the hiring process/steps if mentioned, or 'Not specified' if not available"
+    "hiringProcess": "Brief description of the hiring process/steps if mentioned, or 'Not specified' if not available",
+    "warnings": [
+        {"type": "warning/red-flag", "category": "benefits/compensation/culture/transparency", "message": "Clear description of the concern"}
+    ]
 }
 
 Guidelines:
@@ -224,6 +237,22 @@ Guidelines:
 - niceToHaveSkills: Extract optional/preferred/nice-to-have skills as simple strings
 - companyBackground: Summarize what the company does, their industry, size, or mission if mentioned
 - hiringProcess: Include any information about interview rounds, coding tests, timeline, etc.
+- warnings: Identify red flags or concerns about the job posting. Include warnings for:
+  * No benefits mentioned (health insurance, retirement, PTO, etc.)
+  * No salary range or compensation details provided
+  * Vague or unrealistic job requirements
+  * Missing information about work-life balance
+  * No mention of growth opportunities or professional development
+  * Unclear expectations or responsibilities
+  * Excessive or unpaid overtime expectations
+  * "Work hard, play hard" or similar culture red flags
+  * "Rockstar" or "ninja" language that may indicate poor work culture
+  * Requirements for unpaid work or "passion" without fair compensation
+
+  For each warning:
+  - type: Use "warning" for minor concerns, "red-flag" for serious concerns
+  - category: One of "benefits", "compensation", "culture", "transparency", "expectations"
+  - message: Clear, concise explanation of the concern from a candidate's perspective
 
 Job Advertisement:
 {$jobAdText}
@@ -256,9 +285,128 @@ PROMPT;
                 'benefits' => $data['benefits'] ?? [],
                 'salaryRange' => $data['salaryRange'] ?? 'Not specified',
                 'hiringProcess' => $data['hiringProcess'] ?? 'Not specified',
+                'warnings' => $data['warnings'] ?? [],
             ];
         } catch (\JsonException $e) {
             throw new \RuntimeException('Failed to parse AI response: '.$e->getMessage());
         }
+    }
+
+    protected function buildRecruiterAssessmentPrompt(string $resumeText, string $jobAdText): string
+    {
+        return <<<PROMPT
+Analyze this candidate's resume against the job requirements and provide a comprehensive, objective assessment for the hiring manager. Return ONLY a valid JSON object with this exact structure:
+
+{
+    "overallMatch": 85,
+    "skillBreakdown": {
+        "technical": 90,
+        "soft": 80,
+        "domain": 75
+    },
+    "summary": "This candidate possesses strong technical skills in software development and system design. Their experience aligns well with the requirements of this role. They would likely be a strong candidate for this position.",
+    "strengths": [
+        "13+ years of development experience - seasoned professional, not a junior developer",
+        "Remote work veteran - demonstrated ability to work independently and communicate effectively",
+        "Mentoring experience - can contribute to team growth beyond individual coding tasks",
+        "Product thinking - has built features that users rely on daily",
+        "Fast learner - has successfully adapted to new technologies throughout career"
+    ],
+    "gaps": [
+        "Limited Vue3 production experience - has Vue2 background but Vue3 is still emerging for them",
+        "No TypeScript depth - has used it but not as primary language",
+        "Not frontend-exclusive - pivoting from fullstack to frontend-focused work",
+        "No data visualization experience - hasn't built complex charts or data visualizations"
+    ],
+    "applicationStrategy": {
+        "resumeOptimization": [
+            "The candidate should highlight their 13+ years of experience prominently in the summary",
+            "Creating a 'Remote Work Experience' section would showcase their distributed team successes",
+            "Adding metrics to mentoring experience would strengthen their profile (e.g., 'Mentored 8 junior developers')",
+            "Leading with projects that demonstrate product thinking and user impact would be beneficial"
+        ],
+        "coverLetterFocus": [
+            "The candidate should open with their strongest match: extensive development experience and proven remote work success",
+            "Addressing the Vue3/TypeScript gaps directly with their Vue2 background and learning track record would be strategic",
+            "Closing with genuine enthusiasm for the product and specific reasons for interest in the role would strengthen their application"
+        ],
+        "howToAddressGaps": [
+            "For Vue3: The candidate could mention they're building a side project with Vue3 to gain hands-on experience",
+            "For TypeScript: Highlighting that they've used it and are committed to deepening their knowledge would address the gap",
+            "For frontend focus: Framing their fullstack background as an advantage for understanding system architecture would be beneficial"
+        ]
+    },
+    "interviewPreparation": {
+        "likelyQuestions": [
+            "Ask about their experience working in remote teams and how they stay productive",
+            "Have them walk through a complex feature they built and the impact it had",
+            "Explore how they approach learning new technologies quickly",
+            "Discuss a time when they mentored a junior developer through a challenging problem"
+        ],
+        "topicsToStudy": [
+            "Assess their understanding of Vue 3 Composition API and differences from Vue 2 Options API",
+            "Evaluate their knowledge of TypeScript advanced patterns (generics, utility types, type inference)",
+            "Test their familiarity with modern frontend testing strategies (unit, integration, e2e)"
+        ],
+        "storiesToPrepare": [
+            "Ask for a legacy system migration example: the situation, their task, their approach, and quantifiable impact",
+            "Inquire about remote team coordination challenges and how they kept projects on track",
+            "Explore their experience learning new technology under pressure and delivering successfully"
+        ]
+    },
+    "personalizedRecommendation": {
+        "shouldApply": "This candidate should be interviewed - they possess the core skills needed, and their learning track record suggests they can bridge any gaps quickly.",
+        "biggestAdvantage": "Their combination of deep technical experience and proven remote work success makes them a low-risk hire who can contribute from day one.",
+        "nextStep": "Schedule an initial screening call to assess cultural fit and gauge their genuine interest in transitioning to frontend-focused work."
+    }
+}
+
+Guidelines for assessment (written in 3rd person for recruiter):
+- overallMatch: Overall percentage match (0-100) based on how well the candidate's qualifications align with job requirements
+- skillBreakdown.technical: Score for technical/hard skills (programming, tools, technologies) - 0-100
+- skillBreakdown.soft: Score for soft skills (communication, teamwork, problem-solving) - 0-100
+- skillBreakdown.domain: Score for domain knowledge and industry-specific expertise - 0-100
+- summary: 2-3 sentences in third person ("This candidate...", "They...") explaining the candidate's overall fit and potential
+
+STRENGTHS FORMAT (3-6 items):
+Write each strength in third person as: "[Specific achievement/experience] - [why it matters for this job]"
+Examples:
+- "15 years of backend development - a senior engineer, not a junior"
+- "Led teams of 5+ developers - can mentor and guide others"
+- "Built systems handling millions of users - understands scale"
+- "Strong communication skills - has worked with remote teams successfully"
+Focus on objective assessment. Highlight years of experience, proven abilities, and transferable skills.
+
+GAPS FORMAT (2-4 items):
+Write each gap in third person as: "[What's missing] - [objective observation]"
+Examples:
+- "Limited React experience - has Vue background but React is new"
+- "No AWS certification - has hands-on cloud experience but no formal certification"
+- "Junior in leadership - has mentored individuals but hasn't managed a full team"
+Be objective about gaps while noting related experience.
+
+APPLICATION STRATEGY (written as advice about what the candidate should do):
+- resumeOptimization: 3-4 specific, actionable recommendations for the candidate (written in third person: "The candidate should...")
+- coverLetterFocus: 2-3 key points the candidate should highlight (written as "The candidate should...")
+- howToAddressGaps: 2-3 specific strategies for the candidate to explain gaps (written as "The candidate could...")
+
+INTERVIEW PREPARATION (written as guidance for the recruiter):
+- likelyQuestions: 3-4 interview questions the recruiter should ask based on candidate's background and job requirements
+- topicsToStudy: 2-3 technical or domain topics the recruiter should assess during the interview
+- storiesToPrepare: 2-3 STAR method questions the recruiter should ask
+
+PERSONALIZED RECOMMENDATION (written for the recruiter):
+- shouldApply: Clear, honest advice on whether to interview this candidate now or pass (1-2 sentences, third person)
+- biggestAdvantage: What makes this candidate uniquely valuable for this role (1 sentence)
+- nextStep: One specific, actionable step the recruiter should take (1 sentence)
+
+Job Requirements:
+{$jobAdText}
+
+Candidate Resume:
+{$resumeText}
+
+Return ONLY the JSON object, no additional text or markdown formatting.
+PROMPT;
     }
 }

@@ -18,7 +18,7 @@ import {
     <Head title="Fittable - Find the perfect job match" />
 
     <div
-        class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800"
+        class="min-h-screen bg-gradient-to-br from-gray-300 to-slate-300 dark:from-gray-900 dark:to-gray-800"
     >
         <!-- Header -->
         <header class="border-b bg-white dark:border-gray-800 dark:bg-gray-900">
@@ -95,19 +95,17 @@ import {
                 <div class="grid gap-8 md:grid-cols-3">
                     <!-- Step 1 -->
                     <div
-                        class="border px-6 py-6 text-center dark:border-gray-700 dark:bg-gray-800"
+                        class="border border-2 border-dashed border-[#e900ff] bg-gradient-to-br from-slate-800 to-[#2a1a4a] px-6 py-6 text-center dark:border-gray-700 dark:bg-gray-800"
                     >
                         <div
                             class="mx-auto mb-6 flex items-center justify-center rounded-xl"
                         >
                             <Glasses class="h-8 w-8 text-primary" />
                         </div>
-                        <h3
-                            class="mb-3 text-xl font-bold text-gray-900 dark:text-white"
-                        >
+                        <h3 class="mb-3 text-xl font-bold text-white">
                             Analyze Job Descriptions
                         </h3>
-                        <p class="text-gray-600 dark:text-gray-300">
+                        <p class="text-gray-300">
                             Paste a job description to identify the core skills
                             and qualifications required.
                         </p>
@@ -115,19 +113,17 @@ import {
 
                     <!-- Step 2 -->
                     <div
-                        class="border px-6 py-6 text-center dark:border-gray-700 dark:bg-gray-800"
+                        class="border border-2 border-dashed border-[#e900ff] bg-gradient-to-br from-slate-800 to-[#2a1a4a] px-6 py-6 text-center dark:border-gray-700 dark:bg-gray-800"
                     >
                         <div
                             class="mx-auto mb-6 flex items-center justify-center rounded-xl"
                         >
                             <FileText class="h-8 w-8 text-primary" />
                         </div>
-                        <h3
-                            class="mb-3 text-xl font-bold text-gray-900 dark:text-white"
-                        >
+                        <h3 class="mb-3 text-xl font-bold text-white">
                             Match Resume
                         </h3>
-                        <p class="text-gray-600 dark:text-gray-300">
+                        <p class="text-gray-300">
                             Fittable compares the resume against the job
                             description, highlighting areas of strength and
                             potential gaps.
@@ -136,19 +132,17 @@ import {
 
                     <!-- Step 3 -->
                     <div
-                        class="border px-6 py-6 text-center dark:border-gray-700 dark:bg-gray-800"
+                        class="border border-2 border-dashed border-[#e900ff] bg-gradient-to-br from-slate-800 to-[#2a1a4a] px-6 py-6 text-center dark:border-gray-700 dark:bg-gray-800"
                     >
                         <div
                             class="mx-auto mb-6 flex items-center justify-center rounded-xl"
                         >
                             <Target class="h-8 w-8 text-primary" />
                         </div>
-                        <h3
-                            class="mb-3 text-xl font-bold text-gray-900 dark:text-white"
-                        >
+                        <h3 class="mb-3 text-xl font-bold text-white">
                             Find The Ideal Role
                         </h3>
-                        <p class="text-gray-600 dark:text-gray-300">
+                        <p class="text-gray-300">
                             Discover roles that align with your skills and
                             career goals, maximizing your chances of success.
                         </p>

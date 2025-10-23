@@ -20,6 +20,7 @@ class JobAnalysis extends Model
         'benefits',
         'salary_range',
         'hiring_process',
+        'warnings',
     ];
 
     protected function casts(): array
@@ -30,6 +31,7 @@ class JobAnalysis extends Model
             'responsibilities' => 'array',
             'requirements' => 'array',
             'benefits' => 'array',
+            'warnings' => 'array',
         ];
     }
 

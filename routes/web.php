@@ -12,7 +12,7 @@ Route::get('/', function () {
     return Inertia::render('Landing');
 })->name('home');
 
-// Public routes for recruiters
+// Public route for recruiter landing page
 Route::get('/recruiter', [RecruiterController::class, 'index'])->name('recruiter.index');
 Route::post('/recruiter/match', [RecruiterController::class, 'calculateMatch'])->name('recruiter.match');
 
@@ -30,12 +30,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/analyze/process', [JobAnalysisController::class, 'processPendingAnalysis'])->name('job.analyze.process');
     Route::post('/assess-resume', [JobAnalysisController::class, 'assessResume'])->name('job.assessResume');
 
+    // Authenticated recruiter routes
+    Route::get('/recruiter/match/process', [RecruiterController::class, 'processPendingMatch'])->name('recruiter.match.process');
+
     // Resource routes
     Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments.index');
     Route::get('/assessments/{assessment}', [AssessmentController::class, 'show'])->name('assessments.show');
     Route::get('/job-postings', [JobPostingController::class, 'index'])->name('job-postings.index');
     Route::get('/job-postings/{jobPosting}', [JobPostingController::class, 'show'])->name('job-postings.show');
+    Route::post('/job-postings/{jobPosting}/close', [JobPostingController::class, 'close'])->name('job-postings.close');
+    Route::post('/job-postings/{jobPosting}/reopen', [JobPostingController::class, 'reopen'])->name('job-postings.reopen');
     Route::get('/resumes', [ResumeController::class, 'index'])->name('resumes.index');
+    Route::post('/resumes', [ResumeController::class, 'store'])->name('resumes.store');
     Route::get('/resumes/{resume}', [ResumeController::class, 'show'])->name('resumes.show');
 });
 

@@ -3,21 +3,32 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobPosting;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class JobPostingController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $jobPostings = auth()->user()
+        $showClosed = $request->query('show_closed', '0') === '1';
+
+        $query = auth()->user()
             ->jobPostings()
             ->with('jobAnalysis')
-            ->latest()
-            ->get();
+            ->latest();
+
+        // Filter out closed postings by default
+        if (! $showClosed) {
+            $query->whereNull('closed_at');
+        }
+
+        $jobPostings = $query->get();
 
         return Inertia::render('JobPostings/Index', [
             'jobPostings' => $jobPostings,
+            'showClosed' => $showClosed,
         ]);
     }
 
@@ -46,6 +57,7 @@ class JobPostingController extends Controller
                 'benefits' => $jobPosting->jobAnalysis->benefits,
                 'salaryRange' => $jobPosting->jobAnalysis->salary_range,
                 'hiringProcess' => $jobPosting->jobAnalysis->hiring_process,
+                'warnings' => $jobPosting->jobAnalysis->warnings ?? [],
             ];
         }
 
@@ -68,5 +80,29 @@ class JobPostingController extends Controller
             'userResume' => $userResume,
             'existingAssessment' => $existingAssessment,
         ]);
+    }
+
+    public function close(JobPosting $jobPosting): RedirectResponse
+    {
+        // Ensure the job posting belongs to the authenticated user
+        if ($jobPosting->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $jobPosting->close();
+
+        return back()->with('success', 'Job posting has been closed.');
+    }
+
+    public function reopen(JobPosting $jobPosting): RedirectResponse
+    {
+        // Ensure the job posting belongs to the authenticated user
+        if ($jobPosting->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $jobPosting->reopen();
+
+        return back()->with('success', 'Job posting has been reopened.');
     }
 }

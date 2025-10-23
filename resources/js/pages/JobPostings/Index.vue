@@ -1,11 +1,28 @@
 <script setup lang="ts">
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { index as jobIndex } from '@/routes/job';
-import { index, show } from '@/routes/job-postings';
+import {
+    close as closeJobPosting,
+    index,
+    reopen as reopenJobPosting,
+    show,
+} from '@/routes/job-postings';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/vue3';
-import { Briefcase, Building2, Calendar, MapPin, Plus } from 'lucide-vue-next';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import {
+    Archive,
+    ArchiveRestore,
+    Briefcase,
+    Building2,
+    Calendar,
+    MapPin,
+    Plus,
+} from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
 
 interface JobAnalysis {
     location?: string;
@@ -18,12 +35,33 @@ interface JobPosting {
     job_title: string;
     company: string;
     created_at: string;
+    closed_at: string | null;
+    user_id: number;
     job_analysis?: JobAnalysis;
 }
 
-defineProps<{
+const props = defineProps<{
     jobPostings: JobPosting[];
+    showClosed?: boolean;
 }>();
+
+const page = usePage();
+const currentUserId = computed(() => page.props.auth.user?.id);
+
+// Toggle for showing closed job postings
+const showClosedPostings = ref(props.showClosed ?? false);
+
+// Watch for changes and update the URL
+watch(showClosedPostings, (newValue) => {
+    router.get(
+        index().url,
+        { show_closed: newValue ? '1' : '0' },
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
+});
 
 const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -31,6 +69,24 @@ const formatDate = (dateString: string) => {
         month: 'long',
         day: 'numeric',
     });
+};
+
+const isOwner = (posting: JobPosting) => {
+    return currentUserId.value === posting.user_id;
+};
+
+const handleCloseJobPosting = (posting: JobPosting) => {
+    if (
+        confirm(
+            'Are you sure you want to close this job posting? All related assessments will also be closed.',
+        )
+    ) {
+        router.post(closeJobPosting(posting.id).url);
+    }
+};
+
+const handleReopenJobPosting = (posting: JobPosting) => {
+    router.post(reopenJobPosting(posting.id).url);
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -57,14 +113,30 @@ const breadcrumbs: BreadcrumbItem[] = [
                             View all jobs you've analyzed
                         </p>
                     </div>
-                    <Link :href="jobIndex().url">
-                        <Button
-                            class="gap-2 bg-[#e900ff] text-white hover:bg-[#d100e6]"
-                        >
-                            <Plus class="h-4 w-4" />
-                            Analyze New Job
-                        </Button>
-                    </Link>
+                    <div class="flex items-center gap-4">
+                        <!-- Toggle for closed postings -->
+                        <div class="flex items-center gap-2 border-l border-gray-700 pl-4">
+                            <Switch
+                                v-model="showClosedPostings"
+                                id="show-closed"
+                                class="data-[state=checked]:bg-[#e900ff]"
+                            />
+                            <Label
+                                for="show-closed"
+                                class="cursor-pointer text-sm text-gray-300"
+                            >
+                                Show Closed
+                            </Label>
+                        </div>
+                        <Link :href="jobIndex().url">
+                            <Button
+                                class="gap-2 bg-[#e900ff] text-white hover:bg-[#d100e6]"
+                            >
+                                <Plus class="h-4 w-4" />
+                                Analyze New Job
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
                 <!-- Empty State -->
@@ -108,11 +180,17 @@ const breadcrumbs: BreadcrumbItem[] = [
                                         />
                                     </div>
                                     <div class="flex-1">
-                                        <h3
-                                            class="mb-1 text-2xl font-bold text-white"
-                                        >
-                                            {{ posting.job_title }}
-                                        </h3>
+                                        <div class="mb-1 flex items-center gap-3">
+                                            <h3 class="text-2xl font-bold text-white">
+                                                {{ posting.job_title }}
+                                            </h3>
+                                            <Badge
+                                                v-if="posting.closed_at"
+                                                class="border-0 bg-gray-600 px-2 py-0.5 text-xs font-medium text-white"
+                                            >
+                                                Closed
+                                            </Badge>
+                                        </div>
                                         <div
                                             class="flex items-center gap-2 text-gray-400"
                                         >
@@ -182,6 +260,28 @@ const breadcrumbs: BreadcrumbItem[] = [
                                         View Analysis
                                     </Link>
                                 </Button>
+                                <div v-if="isOwner(posting)">
+                                    <Button
+                                        v-if="!posting.closed_at"
+                                        @click="handleCloseJobPosting(posting)"
+                                        variant="outline"
+                                        size="sm"
+                                        class="w-full gap-2 border-gray-600 text-gray-300 hover:bg-gray-600"
+                                    >
+                                        <Archive class="h-4 w-4" />
+                                        Close
+                                    </Button>
+                                    <Button
+                                        v-else
+                                        @click="handleReopenJobPosting(posting)"
+                                        variant="outline"
+                                        size="sm"
+                                        class="w-full gap-2 border-[#e900ff] text-[#e900ff] hover:bg-[#e900ff]/10"
+                                    >
+                                        <ArchiveRestore class="h-4 w-4" />
+                                        Reopen
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>

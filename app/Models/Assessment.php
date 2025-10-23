@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Assessment extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'resume_id',
@@ -19,6 +22,7 @@ class Assessment extends Model
         'application_strategy',
         'interview_preparation',
         'personalized_recommendation',
+        'closed_at',
     ];
 
     protected function casts(): array
@@ -30,6 +34,7 @@ class Assessment extends Model
             'application_strategy' => 'array',
             'interview_preparation' => 'array',
             'personalized_recommendation' => 'array',
+            'closed_at' => 'datetime',
         ];
     }
 
@@ -46,5 +51,10 @@ class Assessment extends Model
     public function jobPosting(): BelongsTo
     {
         return $this->belongsTo(JobPosting::class);
+    }
+
+    public function isClosed(): bool
+    {
+        return $this->closed_at !== null;
     }
 }

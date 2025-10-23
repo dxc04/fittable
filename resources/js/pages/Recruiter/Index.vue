@@ -101,8 +101,8 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 id="jobDescription"
                                 v-model="form.jobDescription"
                                 placeholder="Paste the full job description here..."
-                                rows="20"
-                                class="min-h-[500px] border-2 border-[#e900ff]/30 bg-[#2a2d3e] font-mono text-sm text-white placeholder:text-gray-400 focus:border-[#e900ff]"
+                                rows="25"
+                                class="min-h-[524px] border-2 border-[#e900ff]/30 bg-[#2a2d3e] font-mono text-sm text-white placeholder:text-gray-400 focus:border-[#e900ff]"
                             />
                             <InputError :message="form.errors.jobDescription" />
                         </div>

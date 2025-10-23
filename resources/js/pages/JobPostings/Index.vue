@@ -115,7 +115,9 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </div>
                     <div class="flex items-center gap-4">
                         <!-- Toggle for closed postings -->
-                        <div class="flex items-center gap-2 border-l border-gray-700 pl-4">
+                        <div
+                            class="flex items-center gap-2 border-l border-gray-700 pl-4"
+                        >
                             <Switch
                                 v-model="showClosedPostings"
                                 id="show-closed"
@@ -180,8 +182,12 @@ const breadcrumbs: BreadcrumbItem[] = [
                                         />
                                     </div>
                                     <div class="flex-1">
-                                        <div class="mb-1 flex items-center gap-3">
-                                            <h3 class="text-2xl font-bold text-white">
+                                        <div
+                                            class="mb-1 flex items-center gap-3"
+                                        >
+                                            <h3
+                                                class="text-2xl font-bold text-white"
+                                            >
                                                 {{ posting.job_title }}
                                             </h3>
                                             <Badge

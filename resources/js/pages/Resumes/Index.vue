@@ -168,7 +168,11 @@ const breadcrumbs: BreadcrumbItem[] = [
                                     {{ resume.assessments_count }}
                                 </span>
                                 <span class="text-gray-400">
-                                    {{ pluralizeAssessment(resume.assessments_count) }}
+                                    {{
+                                        pluralizeAssessment(
+                                            resume.assessments_count,
+                                        )
+                                    }}
                                 </span>
                             </div>
                         </div>

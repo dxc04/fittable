@@ -48,6 +48,11 @@ class JobPosting extends Model
         return $this->belongsToMany(User::class)->withTimestamps();
     }
 
+    public function recruiterAssessments(): HasMany
+    {
+        return $this->hasMany(RecruiterAssessment::class);
+    }
+
     public function isClosed(): bool
     {
         return $this->closed_at !== null;

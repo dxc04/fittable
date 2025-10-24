@@ -15,6 +15,75 @@ class RecruiterController extends Controller
         protected DocumentTextExtractor $documentTextExtractor
     ) {}
 
+    protected function findOrCreateJobPosting(string $jobText, int $userId): \App\Models\JobPosting
+    {
+        $existingPosting = \App\Models\JobPosting::where('original_text', $jobText)
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($existingPosting) {
+            return $existingPosting;
+        }
+
+        $analysis = $this->jobAnalysisService->analyzeJobPosting($jobText);
+
+        $jobPosting = \App\Models\JobPosting::create([
+            'user_id' => $userId,
+            'job_title' => $analysis['jobTitle'] ?? 'Unknown Position',
+            'company' => $analysis['company'] ?? 'Unknown Company',
+            'original_text' => $jobText,
+        ]);
+
+        \App\Models\JobAnalysis::create([
+            'job_posting_id' => $jobPosting->id,
+            'company_background' => $analysis['companyBackground'] ?? null,
+            'location' => $analysis['location'] ?? null,
+            'job_type' => $analysis['jobType'] ?? null,
+            'summary' => $analysis['summary'] ?? null,
+            'required_skills' => $analysis['requiredSkills'] ?? [],
+            'nice_to_have_skills' => $analysis['niceToHaveSkills'] ?? [],
+            'responsibilities' => $analysis['responsibilities'] ?? [],
+            'requirements' => $analysis['requirements'] ?? [],
+            'benefits' => $analysis['benefits'] ?? [],
+            'salary_range' => $analysis['salaryRange'] ?? null,
+            'hiring_process' => $analysis['hiringProcess'] ?? null,
+            'warnings' => $analysis['warnings'] ?? [],
+        ]);
+
+        return $jobPosting;
+    }
+
+    protected function findOrCreateResume(string $resumeText): \App\Models\Resume
+    {
+        $existingResume = \App\Models\Resume::where('resume_text', $resumeText)->first();
+
+        if ($existingResume) {
+            return $existingResume;
+        }
+
+        return \App\Models\Resume::create([
+            'user_id' => null,
+            'resume_text' => $resumeText,
+        ]);
+    }
+
+    protected function createAssessment(array $assessmentData, int $resumeId, int $jobPostingId, ?int $userId): \App\Models\Assessment
+    {
+        return \App\Models\Assessment::create([
+            'user_id' => $userId,
+            'resume_id' => $resumeId,
+            'job_posting_id' => $jobPostingId,
+            'overall_match' => $assessmentData['overallMatch'] ?? 0,
+            'skill_breakdown' => $assessmentData['skillBreakdown'] ?? [],
+            'summary' => $assessmentData['summary'] ?? null,
+            'strengths' => $assessmentData['strengths'] ?? [],
+            'gaps' => $assessmentData['gaps'] ?? [],
+            'application_strategy' => $assessmentData['applicationStrategy'] ?? [],
+            'interview_preparation' => $assessmentData['interviewPreparation'] ?? [],
+            'personalized_recommendation' => $assessmentData['personalizedRecommendation'] ?? [],
+        ]);
+    }
+
     public function index(): Response
     {
         // Set session to indicate user is on recruiter flow
@@ -128,18 +197,28 @@ class RecruiterController extends Controller
             }
 
             // Run AI assessment with recruiter-specific prompt (3rd person)
-            $assessment = $this->jobAnalysisService->assessCandidateForRecruiter(
+            $assessmentData = $this->jobAnalysisService->assessCandidateForRecruiter(
                 $candidateResume,
                 $validated['jobDescription']
             );
 
-            // For authenticated recruiters, optionally save to database
-            // Note: We don't save recruiter assessments to the database by default
-            // since they're typically ad-hoc evaluations without stored job postings
-            // If needed in the future, we can add job posting and resume storage here
+            // Save job posting, resume, and assessment to database
+            $jobPosting = $this->findOrCreateJobPosting($validated['jobDescription'], auth()->id());
+            $resume = $this->findOrCreateResume($candidateResume);
+            $assessment = $this->createAssessment($assessmentData, $resume->id, $jobPosting->id, null);
+
+            // Create recruiter_assessments pivot entry
+            \DB::table('recruiter_assessments')->insert([
+                'user_id' => auth()->id(),
+                'resume_id' => $resume->id,
+                'assessment_id' => $assessment->id,
+                'job_posting_id' => $jobPosting->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
             return Inertia::render('Recruiter/MatchResult', [
-                'assessment' => $assessment,
+                'assessment' => $assessmentData,
                 'jobDescription' => $validated['jobDescription'],
                 'candidateResume' => $candidateResume,
             ]);
@@ -154,5 +233,114 @@ class RecruiterController extends Controller
                 'jobDescription' => 'Failed to calculate match score. Please try again.',
             ]);
         }
+    }
+
+    public function evaluations(): Response
+    {
+        $recruiter = auth()->user();
+
+        $jobPostings = \App\Models\JobPosting::whereHas('recruiterAssessments', function ($query) use ($recruiter) {
+            $query->where('user_id', $recruiter->id);
+        })
+            ->withCount(['recruiterAssessments as assessment_count' => function ($query) use ($recruiter) {
+                $query->where('user_id', $recruiter->id);
+            }])
+            ->with(['jobAnalysis', 'recruiterAssessments' => function ($query) use ($recruiter) {
+                $query->where('user_id', $recruiter->id)->with('assessment')->latest();
+            }])
+            ->latest()
+            ->get()
+            ->map(function ($jobPosting) {
+                $assessments = $jobPosting->recruiterAssessments->pluck('assessment');
+
+                return [
+                    'id' => $jobPosting->id,
+                    'job_title' => $jobPosting->job_title,
+                    'company' => $jobPosting->company,
+                    'assessment_count' => $jobPosting->assessment_count,
+                    'average_match_score' => $assessments->avg('overall_match'),
+                    'highest_match_score' => $assessments->max('overall_match'),
+                    'latest_evaluation_date' => $jobPosting->recruiterAssessments->first()?->created_at,
+                    'job_analysis' => $jobPosting->jobAnalysis ? [
+                        'location' => $jobPosting->jobAnalysis->location,
+                        'job_type' => $jobPosting->jobAnalysis->job_type,
+                        'summary' => $jobPosting->jobAnalysis->summary,
+                    ] : null,
+                ];
+            });
+
+        return Inertia::render('Recruiter/Evaluations/Index', [
+            'jobPostings' => $jobPostings,
+        ]);
+    }
+
+    public function candidates(\App\Models\JobPosting $jobPosting): Response
+    {
+        $recruiter = auth()->user();
+
+        if (! $jobPosting->recruiterAssessments()->where('user_id', $recruiter->id)->exists()) {
+            abort(403, 'You have not evaluated any candidates for this job posting.');
+        }
+
+        $candidates = \App\Models\RecruiterAssessment::where('user_id', $recruiter->id)
+            ->where('job_posting_id', $jobPosting->id)
+            ->with(['assessment', 'resume'])
+            ->latest()
+            ->get()
+            ->map(function ($recruiterAssessment) {
+                return [
+                    'id' => $recruiterAssessment->id,
+                    'assessment_id' => $recruiterAssessment->assessment_id,
+                    'resume_id' => $recruiterAssessment->resume_id,
+                    'overall_match' => $recruiterAssessment->assessment->overall_match,
+                    'summary' => $recruiterAssessment->assessment->summary,
+                    'strengths' => $recruiterAssessment->assessment->strengths,
+                    'gaps' => $recruiterAssessment->assessment->gaps,
+                    'evaluated_at' => $recruiterAssessment->created_at,
+                    'resume_preview' => \Str::limit($recruiterAssessment->resume->resume_text, 200),
+                ];
+            });
+
+        return Inertia::render('Recruiter/Evaluations/Candidates', [
+            'jobPosting' => [
+                'id' => $jobPosting->id,
+                'job_title' => $jobPosting->job_title,
+                'company' => $jobPosting->company,
+            ],
+            'candidates' => $candidates,
+        ]);
+    }
+
+    public function viewAssessment(\App\Models\JobPosting $jobPosting, \App\Models\Assessment $assessment): Response
+    {
+        $recruiter = auth()->user();
+
+        $recruiterAssessment = \App\Models\RecruiterAssessment::where('user_id', $recruiter->id)
+            ->where('job_posting_id', $jobPosting->id)
+            ->where('assessment_id', $assessment->id)
+            ->firstOrFail();
+
+        $assessment->load('resume');
+
+        return Inertia::render('Recruiter/Evaluations/AssessmentDetail', [
+            'jobPosting' => [
+                'id' => $jobPosting->id,
+                'job_title' => $jobPosting->job_title,
+                'company' => $jobPosting->company,
+            ],
+            'assessment' => [
+                'id' => $assessment->id,
+                'overall_match' => $assessment->overall_match,
+                'summary' => $assessment->summary,
+                'strengths' => $assessment->strengths,
+                'gaps' => $assessment->gaps,
+                'skill_breakdown' => $assessment->skill_breakdown,
+                'evaluated_at' => $recruiterAssessment->created_at,
+            ],
+            'resume' => [
+                'id' => $assessment->resume->id,
+                'resume_text' => $assessment->resume->resume_text,
+            ],
+        ]);
     }
 }

@@ -2,9 +2,9 @@
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { Button } from '@/components/ui/button';
 import { index } from '@/routes/job';
-import { store } from '@/routes/login';
+import { store as loginStore } from '@/routes/login';
 import { index as recruiterIndex } from '@/routes/recruiter';
-import { create } from '@/routes/register';
+import { store as registerStore } from '@/routes/register';
 import { Head, Link } from '@inertiajs/vue3';
 import {
     ArrowRight,
@@ -31,11 +31,11 @@ import {
                 </div>
                 <nav class="flex items-center gap-4">
                     <Link
-                        :href="store.url()"
+                        :href="loginStore.url()"
                         class="text-md font-semibold text-gray-700 hover:text-primary dark:text-gray-300 dark:hover:text-primary"
                         >Login</Link
                     >
-                    <Link :href="create.url()">
+                    <Link :href="registerStore.url()">
                         <Button
                             size="sm"
                             class="bg-primary text-white hover:bg-primary/90"

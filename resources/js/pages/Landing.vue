@@ -3,6 +3,7 @@ import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { Button } from '@/components/ui/button';
 import { index } from '@/routes/job';
 import { store } from '@/routes/login';
+import { create } from '@/routes/register';
 import { index as recruiterIndex } from '@/routes/recruiter';
 import { Head, Link } from '@inertiajs/vue3';
 import {
@@ -28,12 +29,20 @@ import {
                 <div class="flex items-center gap-3">
                     <AppLogoIcon class="h-10 w-40" />
                 </div>
-                <nav class="flex items-center gap-6">
+                <nav class="flex items-center gap-4">
                     <Link
                         :href="store.url()"
-                        class="text-md font-semibold text-primary hover:text-primary/80"
+                        class="text-md font-semibold text-gray-700 hover:text-primary dark:text-gray-300 dark:hover:text-primary"
                         >Login</Link
                     >
+                    <Link :href="create.url()">
+                        <Button
+                            size="sm"
+                            class="bg-primary text-white hover:bg-primary/90"
+                        >
+                            Sign Up
+                        </Button>
+                    </Link>
                 </nav>
             </div>
         </header>

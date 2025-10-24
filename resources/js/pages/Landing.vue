@@ -3,8 +3,8 @@ import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { Button } from '@/components/ui/button';
 import { index } from '@/routes/job';
 import { store } from '@/routes/login';
-import { create } from '@/routes/register';
 import { index as recruiterIndex } from '@/routes/recruiter';
+import { create } from '@/routes/register';
 import { Head, Link } from '@inertiajs/vue3';
 import {
     ArrowRight,

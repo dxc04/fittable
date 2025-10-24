@@ -32,8 +32,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Authenticated recruiter routes
     Route::get('/recruiter/match/process', [RecruiterController::class, 'processPendingMatch'])->name('recruiter.match.process');
+});
 
-    // Resource routes
+// Job Seeker protected routes
+Route::middleware(['auth', 'job_seeker'])->group(function () {
     Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments.index');
     Route::get('/assessments/{assessment}', [AssessmentController::class, 'show'])->name('assessments.show');
     Route::get('/job-postings', [JobPostingController::class, 'index'])->name('job-postings.index');
@@ -43,6 +45,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/resumes', [ResumeController::class, 'index'])->name('resumes.index');
     Route::post('/resumes', [ResumeController::class, 'store'])->name('resumes.store');
     Route::get('/resumes/{resume}', [ResumeController::class, 'show'])->name('resumes.show');
+});
+
+// Recruiter protected routes
+Route::middleware(['auth', 'recruiter'])->prefix('recruiter')->name('recruiter.')->group(function () {
+    Route::get('/evaluations', [RecruiterController::class, 'evaluations'])->name('evaluations.index');
+    Route::get('/evaluations/{jobPosting}', [RecruiterController::class, 'candidates'])->name('evaluations.candidates');
+    Route::get('/evaluations/{jobPosting}/assessment/{assessment}', [RecruiterController::class, 'viewAssessment'])->name('evaluations.assessment');
 });
 
 require __DIR__.'/settings.php';

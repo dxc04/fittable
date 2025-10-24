@@ -15,10 +15,12 @@ import {
 import { index as assessmentsIndex } from '@/routes/assessments';
 import { index as analyze } from '@/routes/job';
 import { index as jobPostingsIndex } from '@/routes/job-postings';
+import { index as recruiterIndex } from '@/routes/recruiter';
+import { index as evaluationsIndex } from '@/routes/recruiter/evaluations';
 import { index as resumesIndex } from '@/routes/resumes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookMarked, BookOpen, FileText, Glasses } from 'lucide-vue-next';
+import { BookMarked, BookOpen, FileText, Glasses, Users } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
 
@@ -51,19 +53,14 @@ const jobSeekerNav: NavItem[] = [
 
 const recruiterNav: NavItem[] = [
     {
-        title: 'Job Postings',
-        href: jobPostingsIndex(),
-        icon: BookMarked,
+        title: 'Match Tool',
+        href: recruiterIndex(),
+        icon: Glasses,
     },
     {
-        title: 'Resumes',
-        href: resumesIndex(),
-        icon: FileText,
-    },
-    {
-        title: 'Assessments',
-        href: assessmentsIndex(),
-        icon: BookOpen,
+        title: 'My Evaluations',
+        href: evaluationsIndex(),
+        icon: Users,
     },
 ];
 

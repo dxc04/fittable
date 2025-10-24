@@ -20,7 +20,13 @@ import { index as evaluationsIndex } from '@/routes/recruiter/evaluations';
 import { index as resumesIndex } from '@/routes/resumes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookMarked, BookOpen, FileText, Glasses, Users } from 'lucide-vue-next';
+import {
+    BookMarked,
+    BookOpen,
+    FileText,
+    Glasses,
+    Users,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
 

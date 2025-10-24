@@ -34,6 +34,7 @@ test('user registered from recruiter page gets recruiter role', function () {
         'email' => 'recruiter@example.com',
         'password' => 'password123',
         'password_confirmation' => 'password123',
+        'role' => 'recruiter',
     ]);
 
     $response->assertRedirect();
@@ -60,12 +61,32 @@ test('guest can submit match - redirected to register with pending data', functi
 
 test('authenticated user can calculate match with job description and resume text', function () {
     $user = User::factory()->create();
+    $user->assignRole('recruiter');
     $this->actingAs($user);
 
     $jobDescription = 'We are looking for a Senior Software Engineer with 5+ years of experience in PHP and Laravel. Must have strong problem-solving skills and experience with Vue.js.';
     $candidateResume = 'Experienced Software Engineer with 6 years of PHP and Laravel development. Skilled in Vue.js, TypeScript, and building scalable web applications.';
 
     $this->mock(JobAnalysisService::class, function ($mock) {
+        $mock->shouldReceive('analyzeJobPosting')
+            ->zeroOrMoreTimes()
+            ->andReturn([
+                'jobTitle' => 'Senior Software Engineer',
+                'company' => 'Tech Company',
+                'companyBackground' => 'A leading tech company',
+                'location' => 'Remote',
+                'jobType' => 'Full-time',
+                'summary' => 'Looking for a Senior Software Engineer',
+                'requiredSkills' => ['PHP', 'Laravel', 'Vue.js'],
+                'niceToHaveSkills' => ['TypeScript'],
+                'responsibilities' => ['Build scalable applications'],
+                'requirements' => ['5+ years experience'],
+                'benefits' => ['Competitive salary'],
+                'salaryRange' => '$100k-$150k',
+                'hiringProcess' => 'Standard interview process',
+                'warnings' => [],
+            ]);
+
         $mock->shouldReceive('assessCandidateForRecruiter')
             ->once()
             ->andReturn([
@@ -106,6 +127,7 @@ test('authenticated user can calculate match with job description and resume tex
 
 test('authenticated user can calculate match with job description and uploaded resume file', function () {
     $user = User::factory()->create();
+    $user->assignRole('recruiter');
     $this->actingAs($user);
 
     Storage::fake('local');
@@ -121,6 +143,25 @@ test('authenticated user can calculate match with job description and uploaded r
     });
 
     $this->mock(JobAnalysisService::class, function ($mock) {
+        $mock->shouldReceive('analyzeJobPosting')
+            ->zeroOrMoreTimes()
+            ->andReturn([
+                'jobTitle' => 'Senior Software Engineer',
+                'company' => 'Tech Company',
+                'companyBackground' => 'A leading tech company',
+                'location' => 'Remote',
+                'jobType' => 'Full-time',
+                'summary' => 'Looking for a Senior Software Engineer',
+                'requiredSkills' => ['PHP', 'Laravel'],
+                'niceToHaveSkills' => [],
+                'responsibilities' => ['Build scalable applications'],
+                'requirements' => ['5+ years experience'],
+                'benefits' => ['Competitive salary'],
+                'salaryRange' => '$100k-$150k',
+                'hiringProcess' => 'Standard interview process',
+                'warnings' => [],
+            ]);
+
         $mock->shouldReceive('assessCandidateForRecruiter')
             ->once()
             ->andReturn([
@@ -236,12 +277,32 @@ test('validates resume file size', function () {
 
 test('handles AI service errors gracefully', function () {
     $user = User::factory()->create();
+    $user->assignRole('recruiter');
     $this->actingAs($user);
 
     $jobDescription = 'We are looking for a Senior Software Engineer with 5+ years of experience in PHP and Laravel.';
     $candidateResume = 'Experienced Software Engineer with 6 years of PHP and Laravel development.';
 
     $this->mock(JobAnalysisService::class, function ($mock) {
+        $mock->shouldReceive('analyzeJobPosting')
+            ->zeroOrMoreTimes()
+            ->andReturn([
+                'jobTitle' => 'Senior Software Engineer',
+                'company' => 'Tech Company',
+                'companyBackground' => 'A leading tech company',
+                'location' => 'Remote',
+                'jobType' => 'Full-time',
+                'summary' => 'Looking for a Senior Software Engineer',
+                'requiredSkills' => ['PHP', 'Laravel'],
+                'niceToHaveSkills' => [],
+                'responsibilities' => ['Build scalable applications'],
+                'requirements' => ['5+ years experience'],
+                'benefits' => ['Competitive salary'],
+                'salaryRange' => '$100k-$150k',
+                'hiringProcess' => 'Standard interview process',
+                'warnings' => [],
+            ]);
+
         $mock->shouldReceive('assessCandidateForRecruiter')
             ->once()
             ->andThrow(new \Exception('AI service error'));

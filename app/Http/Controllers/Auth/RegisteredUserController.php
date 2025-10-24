@@ -18,9 +18,14 @@ class RegisteredUserController extends Controller
     /**
      * Show the registration page.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        return Inertia::render('auth/Register');
+        $registrationRole = $request->session()->get('registration_role', 'job_seeker');
+
+        return Inertia::render('auth/Register', [
+            'registrationRole' => $registrationRole,
+            'roleFromSession' => $request->session()->has('registration_role'),
+        ]);
     }
 
     /**
@@ -37,6 +42,7 @@ class RegisteredUserController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
+                'role' => 'required|in:job_seeker,recruiter',
             ]);
 
             \Log::info('Validation passed');
@@ -49,8 +55,8 @@ class RegisteredUserController extends Controller
 
             \Log::info('User created', ['user_id' => $user->id]);
 
-            // Assign role based on registration flow
-            $role = $request->session()->get('registration_role', 'job_seeker');
+            // Assign role from form input (with session fallback for safety)
+            $role = $request->input('role', $request->session()->get('registration_role', 'job_seeker'));
             $user->assignRole($role);
 
             \Log::info('Role assigned', ['user_id' => $user->id, 'role' => $role]);

@@ -9,6 +9,16 @@ import AuthBase from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
 import { Form, Head } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+
+interface Props {
+    registrationRole?: string;
+    roleFromSession?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    registrationRole: 'job_seeker',
+    roleFromSession: false,
+});
 </script>
 
 <template>
@@ -55,12 +65,46 @@ import { LoaderCircle } from 'lucide-vue-next';
                 </div>
 
                 <div class="grid gap-2">
+                    <Label for="role">I am a</Label>
+                    <div class="flex gap-4">
+                        <label class="flex flex-1 items-center gap-2 cursor-pointer rounded-lg border p-3 transition-colors" :class="roleFromSession ? 'opacity-75 cursor-not-allowed' : 'hover:border-primary'">
+                            <input
+                                type="radio"
+                                name="role"
+                                value="job_seeker"
+                                :checked="registrationRole === 'job_seeker'"
+                                :disabled="roleFromSession"
+                                :tabindex="3"
+                                class="h-4 w-4"
+                            />
+                            <span class="text-sm font-medium">Job Seeker</span>
+                        </label>
+                        <label class="flex flex-1 items-center gap-2 cursor-pointer rounded-lg border p-3 transition-colors" :class="roleFromSession ? 'opacity-75 cursor-not-allowed' : 'hover:border-primary'">
+                            <input
+                                type="radio"
+                                name="role"
+                                value="recruiter"
+                                :checked="registrationRole === 'recruiter'"
+                                :disabled="roleFromSession"
+                                :tabindex="3"
+                                class="h-4 w-4"
+                            />
+                            <span class="text-sm font-medium">Recruiter</span>
+                        </label>
+                    </div>
+                    <p v-if="roleFromSession" class="text-xs text-muted-foreground">
+                        Role is pre-selected based on your activity
+                    </p>
+                    <InputError :message="errors.role" />
+                </div>
+
+                <div class="grid gap-2">
                     <Label for="password">Password</Label>
                     <Input
                         id="password"
                         type="password"
                         required
-                        :tabindex="3"
+                        :tabindex="4"
                         autocomplete="new-password"
                         name="password"
                         placeholder="Password"
@@ -74,7 +118,7 @@ import { LoaderCircle } from 'lucide-vue-next';
                         id="password_confirmation"
                         type="password"
                         required
-                        :tabindex="4"
+                        :tabindex="5"
                         autocomplete="new-password"
                         name="password_confirmation"
                         placeholder="Confirm password"
@@ -85,7 +129,7 @@ import { LoaderCircle } from 'lucide-vue-next';
                 <Button
                     type="submit"
                     class="mt-2 w-full"
-                    tabindex="5"
+                    tabindex="6"
                     :disabled="processing"
                     data-test="register-user-button"
                 >
@@ -102,7 +146,7 @@ import { LoaderCircle } from 'lucide-vue-next';
                 <TextLink
                     :href="login()"
                     class="underline underline-offset-4"
-                    :tabindex="6"
+                    :tabindex="7"
                     >Log in</TextLink
                 >
             </div>

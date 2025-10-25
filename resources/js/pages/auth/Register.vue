@@ -15,7 +15,7 @@ interface Props {
     roleFromSession?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+const { registrationRole, roleFromSession } = withDefaults(defineProps<Props>(), {
     registrationRole: 'job_seeker',
     roleFromSession: false,
 });

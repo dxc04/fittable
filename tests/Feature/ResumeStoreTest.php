@@ -5,6 +5,7 @@ use Illuminate\Http\UploadedFile;
 
 test('authenticated user can store resume with text', function () {
     $user = User::factory()->create();
+    $user->assignRole('job_seeker');
 
     $resumeText = 'This is my resume text with over 50 characters to meet the validation requirement.';
 
@@ -23,6 +24,7 @@ test('authenticated user can store resume with text', function () {
 
 test('resume file must be valid format', function () {
     $user = User::factory()->create();
+    $user->assignRole('job_seeker');
 
     $file = UploadedFile::fake()->create('resume.exe', 1, 'application/x-msdownload');
 
@@ -35,6 +37,7 @@ test('resume file must be valid format', function () {
 
 test('resume requires either text or file', function () {
     $user = User::factory()->create();
+    $user->assignRole('job_seeker');
 
     $response = $this->actingAs($user)->post(route('resumes.store'), []);
 
@@ -43,6 +46,7 @@ test('resume requires either text or file', function () {
 
 test('resume text must be at least 50 characters', function () {
     $user = User::factory()->create();
+    $user->assignRole('job_seeker');
 
     $response = $this->actingAs($user)->post(route('resumes.store'), [
         'resumeText' => 'Too short',
@@ -53,6 +57,7 @@ test('resume text must be at least 50 characters', function () {
 
 test('duplicate resume is rejected', function () {
     $user = User::factory()->create();
+    $user->assignRole('job_seeker');
 
     $resumeText = 'This is my resume text with over 50 characters to meet the validation requirement.';
 

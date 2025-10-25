@@ -6,6 +6,7 @@ use App\Models\User;
 
 test('user can close their own job posting', function () {
     $user = User::factory()->create();
+    $user->assignRole('job_seeker');
     $jobPosting = JobPosting::factory()->create(['user_id' => $user->id]);
 
     $response = $this->actingAs($user)->post(route('job-postings.close', $jobPosting));
@@ -19,6 +20,7 @@ test('user can close their own job posting', function () {
 
 test('closing job posting also closes related assessments', function () {
     $user = User::factory()->create();
+    $user->assignRole('job_seeker');
     $jobPosting = JobPosting::factory()->create(['user_id' => $user->id]);
 
     // Create assessments for this job posting
@@ -36,7 +38,9 @@ test('closing job posting also closes related assessments', function () {
 
 test('user cannot close another users job posting', function () {
     $user = User::factory()->create();
+    $user->assignRole('job_seeker');
     $otherUser = User::factory()->create();
+    $otherUser->assignRole('job_seeker');
     $jobPosting = JobPosting::factory()->create(['user_id' => $otherUser->id]);
 
     $response = $this->actingAs($user)->post(route('job-postings.close', $jobPosting));
@@ -49,6 +53,7 @@ test('user cannot close another users job posting', function () {
 
 test('user can reopen their closed job posting', function () {
     $user = User::factory()->create();
+    $user->assignRole('job_seeker');
     $jobPosting = JobPosting::factory()->closed()->create(['user_id' => $user->id]);
 
     $response = $this->actingAs($user)->post(route('job-postings.reopen', $jobPosting));
@@ -62,6 +67,7 @@ test('user can reopen their closed job posting', function () {
 
 test('reopening job posting does not reopen assessments', function () {
     $user = User::factory()->create();
+    $user->assignRole('job_seeker');
     $jobPosting = JobPosting::factory()->closed()->create(['user_id' => $user->id]);
 
     // Create closed assessments for this job posting

@@ -14,6 +14,7 @@ test('new users can register', function () {
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'role' => 'job_seeker',
     ]);
 
     $this->assertAuthenticated();
@@ -26,6 +27,7 @@ test('new users get job_seeker role by default', function () {
         'email' => 'jobseeker@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'role' => 'job_seeker',
     ]);
 
     $user = User::where('email', 'jobseeker@example.com')->first();

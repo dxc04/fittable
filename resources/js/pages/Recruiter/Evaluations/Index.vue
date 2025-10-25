@@ -21,7 +21,7 @@ interface JobPosting {
     } | null;
 }
 
-const props = defineProps<{
+defineProps<{
     jobPostings: JobPosting[];
 }>();
 

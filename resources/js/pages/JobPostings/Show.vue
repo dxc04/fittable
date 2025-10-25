@@ -259,7 +259,6 @@ const breadcrumbs: BreadcrumbItem[] = [
                             <div
                                 v-if="
                                     isJobSeeker &&
-                                    userResume &&
                                     !jobPosting.closed_at
                                 "
                                 class="flex gap-2"

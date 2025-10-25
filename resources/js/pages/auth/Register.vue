@@ -67,27 +67,51 @@ const props = withDefaults(defineProps<Props>(), {
                 <div class="grid gap-2">
                     <Label for="role">I am a</Label>
                     <div class="flex gap-4">
-                        <label class="flex flex-1 items-center gap-2 cursor-pointer rounded-lg border p-3 transition-colors" :class="roleFromSession ? 'opacity-75 cursor-not-allowed' : 'hover:border-primary'">
+                        <label
+                            class="flex flex-1 items-center gap-2 rounded-lg border p-3 transition-colors"
+                            :class="[
+                                registrationRole === 'job_seeker'
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-input',
+                                roleFromSession
+                                    ? 'cursor-not-allowed pointer-events-none opacity-90'
+                                    : 'cursor-pointer hover:border-primary',
+                            ]"
+                        >
                             <input
                                 type="radio"
                                 name="role"
                                 value="job_seeker"
                                 :checked="registrationRole === 'job_seeker'"
-                                :disabled="roleFromSession"
                                 :tabindex="3"
                                 class="h-4 w-4"
+                                :class="
+                                    roleFromSession ? 'pointer-events-none' : ''
+                                "
                             />
                             <span class="text-sm font-medium">Job Seeker</span>
                         </label>
-                        <label class="flex flex-1 items-center gap-2 cursor-pointer rounded-lg border p-3 transition-colors" :class="roleFromSession ? 'opacity-75 cursor-not-allowed' : 'hover:border-primary'">
+                        <label
+                            class="flex flex-1 items-center gap-2 rounded-lg border p-3 transition-colors"
+                            :class="[
+                                registrationRole === 'recruiter'
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-input',
+                                roleFromSession
+                                    ? 'cursor-not-allowed pointer-events-none opacity-90'
+                                    : 'cursor-pointer hover:border-primary',
+                            ]"
+                        >
                             <input
                                 type="radio"
                                 name="role"
                                 value="recruiter"
                                 :checked="registrationRole === 'recruiter'"
-                                :disabled="roleFromSession"
                                 :tabindex="3"
                                 class="h-4 w-4"
+                                :class="
+                                    roleFromSession ? 'pointer-events-none' : ''
+                                "
                             />
                             <span class="text-sm font-medium">Recruiter</span>
                         </label>

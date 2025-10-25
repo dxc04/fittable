@@ -96,13 +96,9 @@ class RegisteredUserController extends Controller
 
             return to_route('job.analyze');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Registration failed', [
+            \Log::error('Registration validation failed', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
-
-            // Keep pending data in session when validation fails
-            $request->session()->keep(['pending_job_analysis', 'pending_recruiter_match', 'registration_role']);
 
             throw $e;
         } catch (\Exception $e) {

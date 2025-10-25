@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { evaluationsCandidates, index } from '@/routes/recruiter';
+import recruiter from '@/routes/recruiter';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
 import { Briefcase, ChevronRight, TrendingUp, Users } from 'lucide-vue-next';
@@ -48,7 +48,7 @@ const formatDate = (dateString: string) => {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Recruiter',
-        href: index().url,
+        href: recruiter.index().url,
     },
     {
         title: 'My Evaluations',
@@ -75,7 +75,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 posting
                             </p>
                         </div>
-                        <Link :href="index.url()">
+                        <Link :href="recruiter.index.url()">
                             <Button
                                 variant="outline"
                                 class="border-[#e900ff] bg-[#e900ff]/10 text-[#e900ff] hover:bg-[#e900ff]/20"
@@ -101,7 +101,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                     <p class="mb-6 text-sm text-gray-400">
                         Start evaluating candidates to see them appear here
                     </p>
-                    <Link :href="index.url()">
+                    <Link :href="recruiter.index.url()">
                         <Button
                             class="bg-[#e900ff] text-white hover:bg-[#d100e6]"
                         >
@@ -212,7 +212,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
                             <!-- View Candidates Button -->
                             <Link
-                                :href="evaluationsCandidates({ jobPosting: job.id }).url"
+                                :href="recruiter.evaluations.candidates({ jobPosting: job.id }).url"
                             >
                                 <Button
                                     class="w-full gap-2 bg-gray-700 text-white transition-colors group-hover:bg-[#e900ff] group-hover:text-white"

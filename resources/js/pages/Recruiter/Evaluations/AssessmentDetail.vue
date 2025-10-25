@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
-import {
-    evaluationsCandidates,
-    evaluationsIndex,
-    index,
-} from '@/routes/recruiter';
+import recruiter from '@/routes/recruiter';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, Sparkles } from 'lucide-vue-next';
@@ -86,15 +82,15 @@ const formatDate = (dateString: string) => {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Recruiter',
-        href: index().url,
+        href: recruiter.index().url,
     },
     {
         title: 'My Evaluations',
-        href: evaluationsIndex().url,
+        href: recruiter.evaluations.index().url,
     },
     {
         title: props.jobPosting.job_title,
-        href: evaluationsCandidates({ jobPosting: props.jobPosting.id }).url,
+        href: recruiter.evaluations.candidates({ jobPosting: props.jobPosting.id }).url,
     },
     {
         title: 'Assessment',
@@ -115,7 +111,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <div class="flex items-center gap-4">
                             <Link
                                 :href="
-                                    evaluationsCandidates({
+                                    recruiter.evaluations.candidates({
                                         jobPosting: jobPosting.id,
                                     }).url
                                 "

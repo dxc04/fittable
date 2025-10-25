@@ -257,10 +257,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 </Button>
                             </Link>
                             <div
-                                v-if="
-                                    isJobSeeker &&
-                                    !jobPosting.closed_at
-                                "
+                                v-if="isJobSeeker && !jobPosting.closed_at"
                                 class="flex gap-2"
                             >
                                 <Button

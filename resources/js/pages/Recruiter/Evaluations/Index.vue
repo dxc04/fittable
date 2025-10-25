@@ -32,7 +32,8 @@ const getMatchColor = (score: number) => {
 };
 
 const getMatchBadgeColor = (score: number) => {
-    if (score >= 80) return 'bg-green-500/20 text-green-400 border-green-500/50';
+    if (score >= 80)
+        return 'bg-green-500/20 text-green-400 border-green-500/50';
     if (score >= 60) return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
     return 'bg-orange-500/20 text-orange-400 border-orange-500/50';
 };
@@ -71,8 +72,8 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 My Evaluations
                             </h1>
                             <p class="text-sm text-white/90">
-                                Review candidates you've evaluated grouped by job
-                                posting
+                                Review candidates you've evaluated grouped by
+                                job posting
                             </p>
                         </div>
                         <Link :href="recruiter.index.url()">
@@ -178,7 +179,9 @@ const breadcrumbs: BreadcrumbItem[] = [
                                     >
                                     <span
                                         :class="
-                                            getMatchColor(job.average_match_score)
+                                            getMatchColor(
+                                                job.average_match_score,
+                                            )
                                         "
                                         class="text-lg font-bold"
                                         >{{
@@ -212,7 +215,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
                             <!-- View Candidates Button -->
                             <Link
-                                :href="recruiter.evaluations.candidates({ jobPosting: job.id }).url"
+                                :href="
+                                    recruiter.evaluations.candidates({
+                                        jobPosting: job.id,
+                                    }).url
+                                "
                             >
                                 <Button
                                     class="w-full gap-2 bg-gray-700 text-white transition-colors group-hover:bg-[#e900ff] group-hover:text-white"

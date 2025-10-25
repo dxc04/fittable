@@ -15,10 +15,13 @@ interface Props {
     roleFromSession?: boolean;
 }
 
-const { registrationRole, roleFromSession } = withDefaults(defineProps<Props>(), {
-    registrationRole: 'job_seeker',
-    roleFromSession: false,
-});
+const { registrationRole, roleFromSession } = withDefaults(
+    defineProps<Props>(),
+    {
+        registrationRole: 'job_seeker',
+        roleFromSession: false,
+    },
+);
 </script>
 
 <template>
@@ -74,7 +77,7 @@ const { registrationRole, roleFromSession } = withDefaults(defineProps<Props>(),
                                     ? 'border-primary bg-primary/10'
                                     : 'border-input',
                                 roleFromSession
-                                    ? 'cursor-not-allowed pointer-events-none opacity-90'
+                                    ? 'pointer-events-none cursor-not-allowed opacity-90'
                                     : 'cursor-pointer hover:border-primary',
                             ]"
                         >
@@ -98,7 +101,7 @@ const { registrationRole, roleFromSession } = withDefaults(defineProps<Props>(),
                                     ? 'border-primary bg-primary/10'
                                     : 'border-input',
                                 roleFromSession
-                                    ? 'cursor-not-allowed pointer-events-none opacity-90'
+                                    ? 'pointer-events-none cursor-not-allowed opacity-90'
                                     : 'cursor-pointer hover:border-primary',
                             ]"
                         >
@@ -116,7 +119,10 @@ const { registrationRole, roleFromSession } = withDefaults(defineProps<Props>(),
                             <span class="text-sm font-medium">Recruiter</span>
                         </label>
                     </div>
-                    <p v-if="roleFromSession" class="text-xs text-muted-foreground">
+                    <p
+                        v-if="roleFromSession"
+                        class="text-xs text-muted-foreground"
+                    >
                         Role is pre-selected based on your activity
                     </p>
                     <InputError :message="errors.role" />

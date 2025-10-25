@@ -171,11 +171,13 @@ const breadcrumbs: BreadcrumbItem[] = [
                             <!-- Summary -->
                             <div class="mb-4">
                                 <h3
-                                    class="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-400"
+                                    class="mb-2 text-sm font-semibold tracking-wide text-gray-400 uppercase"
                                 >
                                     Summary
                                 </h3>
-                                <p class="text-sm leading-relaxed text-gray-300">
+                                <p
+                                    class="text-sm leading-relaxed text-gray-300"
+                                >
                                     {{ candidate.summary }}
                                 </p>
                             </div>
@@ -194,7 +196,9 @@ const breadcrumbs: BreadcrumbItem[] = [
                                     </h3>
                                     <ul class="space-y-1">
                                         <li
-                                            v-for="(strength, idx) in candidate.strengths.slice(
+                                            v-for="(
+                                                strength, idx
+                                            ) in candidate.strengths.slice(
                                                 0,
                                                 3,
                                             )"
@@ -204,8 +208,10 @@ const breadcrumbs: BreadcrumbItem[] = [
                                             • {{ strength }}
                                         </li>
                                         <li
-                                            v-if="candidate.strengths.length > 3"
-                                            class="text-xs italic text-gray-500"
+                                            v-if="
+                                                candidate.strengths.length > 3
+                                            "
+                                            class="text-xs text-gray-500 italic"
                                         >
                                             +{{
                                                 candidate.strengths.length - 3
@@ -230,10 +236,9 @@ const breadcrumbs: BreadcrumbItem[] = [
                                         class="space-y-1"
                                     >
                                         <li
-                                            v-for="(gap, idx) in candidate.gaps.slice(
-                                                0,
-                                                3,
-                                            )"
+                                            v-for="(
+                                                gap, idx
+                                            ) in candidate.gaps.slice(0, 3)"
                                             :key="idx"
                                             class="text-xs leading-relaxed text-gray-400"
                                         >
@@ -241,7 +246,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                                         </li>
                                         <li
                                             v-if="candidate.gaps.length > 3"
-                                            class="text-xs italic text-gray-500"
+                                            class="text-xs text-gray-500 italic"
                                         >
                                             +{{ candidate.gaps.length - 3 }}
                                             more...
@@ -249,7 +254,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                                     </ul>
                                     <p
                                         v-else
-                                        class="text-xs italic text-gray-500"
+                                        class="text-xs text-gray-500 italic"
                                     >
                                         No significant gaps identified
                                     </p>
@@ -259,7 +264,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                             <!-- Resume Preview -->
                             <div class="mb-4">
                                 <h3
-                                    class="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-400"
+                                    class="mb-2 text-sm font-semibold tracking-wide text-gray-400 uppercase"
                                 >
                                     Resume Preview
                                 </h3>

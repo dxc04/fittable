@@ -90,7 +90,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: props.jobPosting.job_title,
-        href: recruiter.evaluations.candidates({ jobPosting: props.jobPosting.id }).url,
+        href: recruiter.evaluations.candidates({
+            jobPosting: props.jobPosting.id,
+        }).url,
     },
     {
         title: 'Assessment',
@@ -147,7 +149,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                     class="mb-8 border-2 border-[#e900ff] bg-[#2a2d3e] p-8 text-center"
                 >
                     <h2
-                        class="mb-4 text-sm font-bold uppercase tracking-wider text-[#e900ff]"
+                        class="mb-4 text-sm font-bold tracking-wider text-[#e900ff] uppercase"
                     >
                         Candidate Match Score
                     </h2>
@@ -156,13 +158,17 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </div>
                     <div class="mb-4 flex items-center justify-center gap-2">
                         <span
-                            :class="getMatchLabelColor(assessment.overall_match)"
+                            :class="
+                                getMatchLabelColor(assessment.overall_match)
+                            "
                             class="text-lg font-semibold"
                         >
                             {{ getMatchLabel(assessment.overall_match) }}
                         </span>
                         <Sparkles
-                            :class="getMatchLabelColor(assessment.overall_match)"
+                            :class="
+                                getMatchLabelColor(assessment.overall_match)
+                            "
                             class="h-5 w-5"
                         />
                     </div>
@@ -205,7 +211,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
                 <!-- Candidate Strengths -->
                 <div class="mb-8 border-2 border-green-500 bg-[#2a2d3e] p-8">
-                    <h3 class="mb-6 text-2xl font-bold uppercase text-white">
+                    <h3 class="mb-6 text-2xl font-bold text-white uppercase">
                         Candidate Strengths
                     </h3>
                     <div class="space-y-4">
@@ -229,7 +235,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                     v-if="assessment.gaps.length > 0"
                     class="mb-8 border-2 border-orange-500 bg-[#2a2d3e] p-8"
                 >
-                    <h3 class="mb-6 text-2xl font-bold uppercase text-white">
+                    <h3 class="mb-6 text-2xl font-bold text-white uppercase">
                         Gaps & Areas for Discussion
                     </h3>
                     <div class="space-y-4">
@@ -257,7 +263,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         class="max-h-96 overflow-y-auto border-l-4 border-gray-600 bg-gray-800 px-4 py-3"
                     >
                         <pre
-                            class="whitespace-pre-wrap font-mono text-xs leading-relaxed text-gray-300"
+                            class="font-mono text-xs leading-relaxed whitespace-pre-wrap text-gray-300"
                             >{{ resume.resume_text }}</pre
                         >
                     </div>

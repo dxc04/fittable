@@ -15,9 +15,8 @@ import {
 import { index as assessmentsIndex } from '@/routes/assessments';
 import { index as analyze } from '@/routes/job';
 import { index as jobPostingsIndex } from '@/routes/job-postings';
-import { index as recruiterIndex } from '@/routes/recruiter';
+import recruiter, { index as recruiterIndex } from '@/routes/recruiter';
 import { index as resumesIndex } from '@/routes/resumes';
-import recruiter from '@/routes/recruiter';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 import {

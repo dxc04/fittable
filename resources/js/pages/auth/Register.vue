@@ -10,10 +10,11 @@ import { login } from '@/routes';
 import { Form, Head } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 
-const { registrationRole = 'job_seeker', roleFromSession = false } = defineProps<{
-    registrationRole?: string;
-    roleFromSession?: boolean;
-}>();
+const { registrationRole = 'job_seeker', roleFromSession = false } =
+    defineProps<{
+        registrationRole?: string;
+        roleFromSession?: boolean;
+    }>();
 </script>
 
 <template>

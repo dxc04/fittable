@@ -22,9 +22,13 @@ class RegisteredUserController extends Controller
     {
         $registrationRole = $request->session()->get('registration_role', 'job_seeker');
 
+        // Only lock role selection if there's pending job analysis or recruiter match
+        $roleFromSession = $request->session()->has('pending_job_analysis')
+            || $request->session()->has('pending_recruiter_match');
+
         return Inertia::render('auth/Register', [
             'registrationRole' => $registrationRole,
-            'roleFromSession' => $request->session()->has('registration_role'),
+            'roleFromSession' => $roleFromSession,
         ]);
     }
 

@@ -103,16 +103,31 @@ class RecruiterController extends Controller
 
         try {
             // Run AI assessment with recruiter-specific prompt (3rd person)
-            $assessment = $this->jobAnalysisService->assessCandidateForRecruiter(
+            $assessmentData = $this->jobAnalysisService->assessCandidateForRecruiter(
                 $pendingData['candidateResume'],
                 $pendingData['jobDescription']
             );
+
+            // Save job posting, resume, and assessment to database
+            $jobPosting = $this->findOrCreateJobPosting($pendingData['jobDescription'], auth()->id());
+            $resume = $this->findOrCreateResume($pendingData['candidateResume']);
+            $assessment = $this->createAssessment($assessmentData, $resume->id, $jobPosting->id, null);
+
+            // Create recruiter_assessments pivot entry
+            \DB::table('recruiter_assessments')->insert([
+                'user_id' => auth()->id(),
+                'resume_id' => $resume->id,
+                'assessment_id' => $assessment->id,
+                'job_posting_id' => $jobPosting->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
             // Clear pending match from session
             session()->forget('pending_recruiter_match');
 
             return Inertia::render('Recruiter/MatchResult', [
-                'assessment' => $assessment,
+                'assessment' => $assessmentData,
                 'jobDescription' => $pendingData['jobDescription'],
                 'candidateResume' => $pendingData['candidateResume'],
             ]);

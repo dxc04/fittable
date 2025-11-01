@@ -315,3 +315,86 @@ test('handles AI service errors gracefully', function () {
 
     $response->assertSessionHasErrors('jobDescription');
 });
+
+test('processPendingMatch saves evaluation to database after registration', function () {
+    $jobDescription = 'We are looking for a Senior Software Engineer with 5+ years of experience in PHP and Laravel. Must have strong problem-solving skills and experience with Vue.js.';
+    $candidateResume = 'Experienced Software Engineer with 6 years of PHP and Laravel development. Skilled in Vue.js, TypeScript, and building scalable web applications.';
+
+    $this->mock(JobAnalysisService::class, function ($mock) {
+        $mock->shouldReceive('analyzeJobPosting')
+            ->once()
+            ->andReturn([
+                'jobTitle' => 'Senior Software Engineer',
+                'company' => 'Tech Company',
+                'companyBackground' => 'A leading tech company',
+                'location' => 'Remote',
+                'jobType' => 'Full-time',
+                'summary' => 'Looking for a Senior Software Engineer',
+                'requiredSkills' => ['PHP', 'Laravel'],
+                'niceToHaveSkills' => ['Vue.js'],
+                'responsibilities' => ['Build scalable applications'],
+                'requirements' => ['5+ years experience'],
+                'benefits' => ['Competitive salary'],
+                'salaryRange' => '$100k-$150k',
+                'hiringProcess' => 'Standard interview process',
+                'warnings' => [],
+            ]);
+
+        $mock->shouldReceive('assessCandidateForRecruiter')
+            ->once()
+            ->andReturn([
+                'overallMatch' => 85,
+                'summary' => 'Strong candidate with relevant experience',
+                'strengths' => ['PHP expertise', 'Laravel knowledge'],
+                'gaps' => [],
+                'skillBreakdown' => ['PHP' => 90, 'Laravel' => 85],
+                'applicationStrategy' => ['Highlight PHP experience'],
+                'interviewPreparation' => ['Prepare for technical questions'],
+                'personalizedRecommendation' => ['Good fit for the role'],
+            ]);
+    });
+
+    // Store pending match data in session
+    session([
+        'pending_recruiter_match' => [
+            'jobDescription' => $jobDescription,
+            'candidateResume' => $candidateResume,
+        ],
+    ]);
+
+    // Create and authenticate a recruiter user
+    $user = User::factory()->create();
+    $user->assignRole('recruiter');
+    $this->actingAs($user);
+
+    // Process the pending match
+    $response = $this->get(route('recruiter.match.process'));
+
+    // Assert the response is successful
+    $response->assertStatus(200);
+
+    // Assert job posting was created
+    $this->assertDatabaseHas('job_postings', [
+        'user_id' => $user->id,
+        'job_title' => 'Senior Software Engineer',
+        'company' => 'Tech Company',
+    ]);
+
+    // Assert resume was created
+    $this->assertDatabaseHas('resumes', [
+        'resume_text' => $candidateResume,
+    ]);
+
+    // Assert assessment was created
+    $this->assertDatabaseHas('assessments', [
+        'overall_match' => 85,
+    ]);
+
+    // Assert recruiter_assessments pivot entry was created
+    $this->assertDatabaseHas('recruiter_assessments', [
+        'user_id' => $user->id,
+    ]);
+
+    // Assert pending match was cleared from session
+    expect(session('pending_recruiter_match'))->toBeNull();
+});

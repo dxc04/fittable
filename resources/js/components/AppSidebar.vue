@@ -63,6 +63,11 @@ const recruiterNav: NavItem[] = [
         icon: Glasses,
     },
     {
+        title: 'Jobs',
+        href: jobPostingsIndex(),
+        icon: BookMarked,
+    },
+    {
         title: 'My Evaluations',
         href: recruiter.evaluations.index(),
         icon: Users,

@@ -32,16 +32,18 @@ Route::middleware(['auth'])->group(function () {
 
     // Authenticated recruiter routes
     Route::get('/recruiter/match/process', [RecruiterController::class, 'processPendingMatch'])->name('recruiter.match.process');
+
+    // Job postings (accessible to both job seekers and recruiters)
+    Route::get('/job-postings', [JobPostingController::class, 'index'])->name('job-postings.index');
+    Route::get('/job-postings/{jobPosting}', [JobPostingController::class, 'show'])->name('job-postings.show');
+    Route::post('/job-postings/{jobPosting}/close', [JobPostingController::class, 'close'])->name('job-postings.close');
+    Route::post('/job-postings/{jobPosting}/reopen', [JobPostingController::class, 'reopen'])->name('job-postings.reopen');
 });
 
 // Job Seeker protected routes
 Route::middleware(['auth', 'job_seeker'])->group(function () {
     Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments.index');
     Route::get('/assessments/{assessment}', [AssessmentController::class, 'show'])->name('assessments.show');
-    Route::get('/job-postings', [JobPostingController::class, 'index'])->name('job-postings.index');
-    Route::get('/job-postings/{jobPosting}', [JobPostingController::class, 'show'])->name('job-postings.show');
-    Route::post('/job-postings/{jobPosting}/close', [JobPostingController::class, 'close'])->name('job-postings.close');
-    Route::post('/job-postings/{jobPosting}/reopen', [JobPostingController::class, 'reopen'])->name('job-postings.reopen');
     Route::get('/resumes', [ResumeController::class, 'index'])->name('resumes.index');
     Route::post('/resumes', [ResumeController::class, 'store'])->name('resumes.store');
     Route::get('/resumes/{resume}', [ResumeController::class, 'show'])->name('resumes.show');

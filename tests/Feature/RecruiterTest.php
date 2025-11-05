@@ -68,7 +68,7 @@ test('authenticated user can calculate match with job description and resume tex
     $candidateResume = 'Experienced Software Engineer with 6 years of PHP and Laravel development. Skilled in Vue.js, TypeScript, and building scalable web applications.';
 
     $this->mock(JobAnalysisService::class, function ($mock) {
-        $mock->shouldReceive('analyzeJobPosting')
+        $mock->shouldReceive('analyzeJobAd')
             ->zeroOrMoreTimes()
             ->andReturn([
                 'jobTitle' => 'Senior Software Engineer',
@@ -143,7 +143,7 @@ test('authenticated user can calculate match with job description and uploaded r
     });
 
     $this->mock(JobAnalysisService::class, function ($mock) {
-        $mock->shouldReceive('analyzeJobPosting')
+        $mock->shouldReceive('analyzeJobAd')
             ->zeroOrMoreTimes()
             ->andReturn([
                 'jobTitle' => 'Senior Software Engineer',
@@ -284,7 +284,7 @@ test('handles AI service errors gracefully', function () {
     $candidateResume = 'Experienced Software Engineer with 6 years of PHP and Laravel development.';
 
     $this->mock(JobAnalysisService::class, function ($mock) {
-        $mock->shouldReceive('analyzeJobPosting')
+        $mock->shouldReceive('analyzeJobAd')
             ->zeroOrMoreTimes()
             ->andReturn([
                 'jobTitle' => 'Senior Software Engineer',
@@ -321,7 +321,7 @@ test('processPendingMatch saves evaluation to database after registration', func
     $candidateResume = 'Experienced Software Engineer with 6 years of PHP and Laravel development. Skilled in Vue.js, TypeScript, and building scalable web applications.';
 
     $this->mock(JobAnalysisService::class, function ($mock) {
-        $mock->shouldReceive('analyzeJobPosting')
+        $mock->shouldReceive('analyzeJobAd')
             ->once()
             ->andReturn([
                 'jobTitle' => 'Senior Software Engineer',

@@ -25,7 +25,7 @@ class RecruiterController extends Controller
             return $existingPosting;
         }
 
-        $analysis = $this->jobAnalysisService->analyzeJobPosting($jobText);
+        $analysis = $this->jobAnalysisService->analyzeJobAd($jobText);
 
         $jobPosting = \App\Models\JobPosting::create([
             'user_id' => $userId,
